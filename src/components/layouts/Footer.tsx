@@ -1,5 +1,4 @@
-import React from "react";
-import { FaTwitter, FaFacebookF, FaInstagram, FaGithub } from "react-icons/fa";
+import { FaTwitter, FaFacebookF, FaInstagram } from "react-icons/fa";
 import logo from "@/assets/logo.svg";
 
 const COMPANY_LINKS = [

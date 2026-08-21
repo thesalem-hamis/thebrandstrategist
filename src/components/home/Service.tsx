@@ -431,7 +431,6 @@
 
 
 
-import React from "react";
 import { motion } from "framer-motion";
 import profileImage from "@/assets/BIMPE.jpg";
 
