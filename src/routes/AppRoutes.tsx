@@ -14,6 +14,7 @@ import { ScrollColorProvider } from "@/components/providers/ScrollColorContext";
 import { ColorSection } from "@/components/providers/ColorSection";
 import { BackgroundLayer } from "@/components/layouts/BackgroundLayer";
 import { ScrollProgress } from "@/components/layouts/ScrollProgress";
+import { ScrollToTop } from "@/components/layouts/ScrollToTop";
 
 export default function AppRouter() {
   return (
@@ -21,6 +22,7 @@ export default function AppRouter() {
       <ScrollColorProvider>
         <BackgroundLayer />
         <ScrollProgress />
+        <ScrollToTop />
         <Navbar />
 
         <ColorSection color="#ffffff">
@@ -55,7 +57,6 @@ export default function AppRouter() {
           <HowIWork />
         </ColorSection>
 
-        {/* Set these two to CTA's and Footer's actual bg colors */}
         <ColorSection color="#000000">
           <CTA />
         </ColorSection>

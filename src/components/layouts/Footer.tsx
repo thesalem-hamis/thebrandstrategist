@@ -1,4 +1,9 @@
-import { FaTwitter, FaFacebookF, FaInstagram } from "react-icons/fa";
+import {
+  FaXTwitter,
+  FaFacebookF,
+  FaInstagram,
+} from "react-icons/fa6";
+
 import logo from "@/assets/logo.svg";
 
 const COMPANY_LINKS = [
@@ -9,121 +14,181 @@ const COMPANY_LINKS = [
 ];
 
 const RESOURCE_LINKS = [
-  { label: "Free eBook", href: "#" },
-  { label: "Development Tutorial", href: "#" },
-  { label: "How to - Blog", href: "#" },
-  { label: "Youtube Playlist", href: "#" },
+  { label: "Brand Strategy", href: "#services" },
+  { label: "Social Media", href: "#services" },
+  { label: "Content Strategy", href: "#services" },
+  { label: "Case Studies", href: "#portfolio" },
 ];
 
 const SOCIAL_LINKS = [
-  { icon: FaTwitter, href: "#", label: "Twitter" },
+  { icon: FaXTwitter, href: "#", label: "X" },
   { icon: FaFacebookF, href: "#", label: "Facebook" },
   { icon: FaInstagram, href: "#", label: "Instagram" },
-  // { icon: FaGithub, href: "#", label: "Github" },
 ];
 
+const BURGUNDY = "#6B1F3A";
+
 export function Footer() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="w-full bg-white text-black pt-16 pb-8 px-6 sm:px-12 lg:px-20 border-t border-gray-100 font-sans">
-      <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-start gap-12 lg:gap-16">
-        
-        {/* Left Column: Logo & Desktop Copyright */}
-        <div className="flex flex-col gap-8 min-w-[200px]">
-          <a href="#" className="inline-block">
-            <img
-              src={logo}
-              alt="Brand Logo"
-              className="h-20 w-auto object-contain"
-            />
-          </a>
-          
-          {/* Copyright (Hidden on Mobile, Visible on Desktop) */}
-          <p className="hidden md:block text-xs text-zinc-600 font-medium">
-            © {currentYear}, All Rights Reserved
-          </p>
-        </div>
+    <footer className="w-full bg-white text-black font-sans overflow-hidden">
 
-        {/* Right Columns Container */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 md:gap-12 lg:gap-16 w-full max-w-3xl">
-          
-          {/* Company Navigation */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[11px] font-bold uppercase tracking-widest text-zinc-800">
-              COMPANY
-            </h4>
-            <ul className="flex flex-col gap-3">
+      {/* Burgundy top accent */}
+      <div
+        className="h-[3px] w-full"
+        style={{ backgroundColor: BURGUNDY }}
+      />
+
+      {/* =====================================================
+          TOP FOOTER
+      ===================================================== */}
+      <div className="border-b border-black/15">
+        <div className="grid grid-cols-1 md:grid-cols-[1.8fr_1fr_1fr]">
+
+          {/* =================================================
+              LEFT — BRAND STATEMENT
+          ================================================= */}
+          <div
+            className="
+              min-h-[220px]
+              p-6
+              sm:p-8
+              lg:p-10
+              border-b
+              md:border-b-0
+              md:border-r
+              border-black/15
+              flex
+              flex-col
+              justify-between
+            "
+          >
+            <p
+              className="
+                max-w-[370px]
+                text-sm
+                sm:text-[15px]
+                leading-[1.3]
+                font-medium
+                tracking-[-0.02em]
+              "
+            >
+              We build brands with clarity, strategy and
+              intention — creating meaningful identities
+              and social experiences that connect with
+              the right audience.
+            </p>
+
+            <p className="text-xs text-black/40">
+              Brand Strategy · Social Media Strategy
+            </p>
+          </div>
+
+          {/* =================================================
+              CENTER — EXPLORE
+          ================================================= */}
+          <div
+            className="
+              min-h-[220px]
+              p-6
+              sm:p-8
+              lg:p-10
+              border-b
+              md:border-b-0
+              md:border-r
+              border-black/15
+              flex
+              flex-col
+              justify-between
+            "
+          >
+            <p className="text-xs text-black/40 lowercase">
+              explore
+            </p>
+
+            <nav className="flex flex-col gap-3">
               {COMPANY_LINKS.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-xs text-zinc-600 hover:text-black transition-colors font-medium"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources Navigation */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[11px] font-bold uppercase tracking-widest text-zinc-800">
-              RESOURCES
-            </h4>
-            <ul className="flex flex-col gap-3">
-              {RESOURCE_LINKS.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-xs text-zinc-600 hover:text-black transition-colors font-medium"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Newsletter & Social Icons */}
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-4">
-              <h4 className="text-[11px] font-bold uppercase tracking-widest text-zinc-800">
-                NEWSLETTER
-              </h4>
-              
-              <form
-                onSubmit={(e) => e.preventDefault()}
-                className="flex flex-col gap-2.5 w-full max-w-xs"
-              >
-                <input
-                  type="email"
-                  placeholder="ENTER YOUR EMAIL ADDRESS"
-                  required
-                  className="w-full bg-black text-white placeholder-zinc-400 text-[10px] tracking-wider uppercase font-medium px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black/20 transition-all"
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-white hover:bg-zinc-50 text-black border border-black text-[10px] font-bold tracking-wider uppercase py-3 rounded-lg transition-colors duration-200 cursor-pointer"
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="
+                    group
+                    w-fit
+                    text-sm
+                    font-medium
+                    transition-all
+                    duration-300
+                    hover:translate-x-1
+                  "
                 >
-                  SUBSCRIBE NOW
-                </button>
-              </form>
-            </div>
+                  <span className="transition-colors duration-300 group-hover:text-[#6B1F3A]">
+                    {link.label}
+                  </span>
+                </a>
+              ))}
+            </nav>
+          </div>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-5 justify-start mt-2">
+          {/* =================================================
+              RIGHT — FOLLOW
+          ================================================= */}
+          <div
+            className="
+              min-h-[220px]
+              p-6
+              sm:p-8
+              lg:p-10
+              flex
+              flex-col
+              justify-between
+            "
+          >
+            <p className="text-xs text-black/40 lowercase">
+              follow
+            </p>
+
+            <div className="flex flex-col gap-3">
               {SOCIAL_LINKS.map((social) => {
                 const Icon = social.icon;
+
                 return (
                   <a
                     key={social.label}
                     href={social.href}
                     aria-label={social.label}
-                    className="text-black hover:text-zinc-600 transition-colors"
+                    className="
+                      group
+                      flex
+                      items-center
+                      gap-3
+                      w-fit
+                      text-sm
+                      font-medium
+                    "
                   >
-                    <Icon className="w-4 h-4" />
+                    <span
+                      className="
+                        opacity-0
+                        -translate-x-2
+                        transition-all
+                        duration-300
+                        group-hover:opacity-100
+                        group-hover:translate-x-0
+                      "
+                      style={{ color: BURGUNDY }}
+                    >
+                      <Icon className="w-3 h-3" />
+                    </span>
+
+                    <span
+                      className="
+                        transition-all
+                        duration-300
+                        group-hover:translate-x-1
+                        group-hover:text-[#6B1F3A]
+                      "
+                    >
+                      {social.label}
+                    </span>
                   </a>
                 );
               })}
@@ -131,15 +196,160 @@ export function Footer() {
           </div>
 
         </div>
+      </div>
+
+      {/* =====================================================
+          CENTER STATEMENT
+      ===================================================== */}
+      <div
+        className="
+          relative
+          px-5
+          sm:px-10
+          lg:px-16
+          py-14
+          sm:py-18
+          lg:py-20
+        "
+      >
+        <div className="max-w-[900px] mx-auto text-center">
+
+          <h2
+            className="
+              text-[clamp(2rem,4.5vw,4.5rem)]
+              leading-[0.88]
+              tracking-[-0.065em]
+              font-medium
+              uppercase
+              text-black/[0.075]
+              select-none
+            "
+          >
+            Building
+            <br />
+            Brands
+            <br />
+            That Matter
+          </h2>
+
+        </div>
+
+        {/* =================================================
+            LOGO + CONTACT
+        ================================================= */}
+        <div
+          className="
+            mt-14
+            sm:mt-18
+            flex
+            flex-col
+            sm:flex-row
+            items-start
+            sm:items-end
+            justify-between
+            gap-10
+          "
+        >
+
+          {/* Larger Logo */}
+          <a href="#" className="block">
+            <img
+              src={logo}
+              alt="Brand Logo"
+              className="
+                h-20
+                sm:h-24
+                lg:h-28
+                w-auto
+                object-contain
+              "
+            />
+          </a>
+
+          {/* Contact */}
+          <div className="text-left sm:text-right">
+
+            <p className="text-xs text-black/40 mb-1">
+              contact us
+            </p>
+
+            <a
+              href="mailto:hello@example.com"
+              className="
+                text-xs
+                sm:text-sm
+                font-medium
+                transition-colors
+                duration-300
+                hover:text-[#6B1F3A]
+              "
+            >
+              hello@example.com
+            </a>
+
+          </div>
+
+        </div>
+      </div>
+
+      {/* =====================================================
+          BOTTOM BAR
+      ===================================================== */}
+      <div className="border-t border-black/15 px-6 sm:px-10 lg:px-16 py-5">
+
+        <div
+          className="
+            max-w-[1600px]
+            mx-auto
+            flex
+            flex-col
+            sm:flex-row
+            items-center
+            justify-between
+            gap-4
+            text-[10px]
+            uppercase
+            tracking-[0.15em]
+            text-black/40
+          "
+        >
+
+          {/* Copyright */}
+          <span>
+            All Rights Reserved.
+          </span>
+
+          {/* Small service links */}
+          <div className="flex gap-6">
+
+            <a
+              href="#services"
+              className="
+                hover:text-[#6B1F3A]
+                transition-colors
+                duration-300
+              "
+            >
+              Brand Strategy
+            </a>
+
+            <a
+              href="#services"
+              className="
+                hover:text-[#6B1F3A]
+                transition-colors
+                duration-300
+              "
+            >
+              Social Media
+            </a>
+
+          </div>
+
+        </div>
 
       </div>
 
-      {/* Mobile-Only Bottom Copyright Bar */}
-      <div className="mt-12 pt-6 border-t border-gray-100 text-center md:hidden">
-        <p className="text-xs text-zinc-600 font-medium">
-          © {currentYear}, All Rights Reserved
-        </p>
-      </div>
     </footer>
   );
 }

@@ -58,7 +58,7 @@ export function Hero() {
                 vision into <br />
                 brand
               </h1>
-              <p className="font-sans font-light italic text-2xl leading-tight text-white/90 sm:text-3xl md:text-[3.25rem] tracking-tight">
+              <p className="font-sans font-light italic text-3xl leading-tight text-white/90 sm:text-3xl md:text-[3.25rem] tracking-tight">
                 Advantage.
               </p>
             </div>
