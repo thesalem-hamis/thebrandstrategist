@@ -13,12 +13,12 @@ const COMPANY_LINKS = [
   { label: "Contact", href: "#contact" },
 ];
 
-const RESOURCE_LINKS = [
-  { label: "Brand Strategy", href: "#services" },
-  { label: "Social Media", href: "#services" },
-  { label: "Content Strategy", href: "#services" },
-  { label: "Case Studies", href: "#portfolio" },
-];
+// const RESOURCE_LINKS = [
+//   { label: "Brand Strategy", href: "#services" },
+//   { label: "Social Media", href: "#services" },
+//   { label: "Content Strategy", href: "#services" },
+//   { label: "Case Studies", href: "#portfolio" },
+// ];
 
 const SOCIAL_LINKS = [
   { icon: FaXTwitter, href: "#", label: "X" },
