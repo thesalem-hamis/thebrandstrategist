@@ -367,24 +367,24 @@ export function Navbar() {
       } else {
         navigate(targetHref);
       }
-    }, 450); // Matches exit animation duration window
+    }, 450);
   };
 
   return (
     <>
       {/* DESKTOP & MOBILE HEADER */}
-      <header className="absolute top-0 left-0 right-0 z-50 flex justify-center px-4 sm:px-8 py-3 pointer-events-none">
+      <header className="absolute top-0 left-0 right-0 z-50 flex justify-center pl-1 pr-4 sm:px-8 py-3 pointer-events-none">
         <div className="pointer-events-auto flex w-full max-w-7xl items-center justify-between">
           
-          {/* LOGO - Far Left on Mobile & Desktop */}
+          {/* LOGO - Shifted further left on Mobile */}
           <Link
             to="/"
-            className="flex shrink-0 items-center transition-transform duration-200 hover:scale-[1.03]"
+            className="flex shrink-0 items-center transition-transform duration-200 hover:scale-[1.03] -ml-2 sm:ml-0"
           >
             <img
               src={logo}
               alt="The Brand Strategist"
-              className="h-[70px] sm:h-[88px] md:h-[104px] w-auto object-contain"
+              className="h-[95px] sm:h-[88px] md:h-[104px] w-auto object-contain"
             />
           </Link>
 
@@ -413,7 +413,7 @@ export function Navbar() {
             <ArrowUpRight className="ml-1.5 h-3 w-3 md:h-3.5 md:w-3.5" />
           </motion.a>
 
-          {/* MOBILE MENU BUTTON - Far Right on Mobile */}
+          {/* MOBILE MENU BUTTON */}
           <button
             type="button"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -475,7 +475,7 @@ export function Navbar() {
                 <img
                   src={logo}
                   alt="The Brand Strategist"
-                  className="h-14 w-auto object-contain"
+                  className="h-16 w-auto object-contain"
                 />
               </button>
 
