@@ -1,70 +1,30 @@
-import About from "@/components/home/About";
-import CTA from "@/components/home/CTA";
-import { Hero } from "@/components/home/Hero";
-import HowIWork from "@/components/home/HowIWork";
-import Partner from "@/components/home/Partners";
-import Pricing from "@/components/home/Pricing";
-import Service from "@/components/home/Service";
-import Testimonials from "@/components/home/Testimonials";
-import Work from "@/components/home/work";
-import Footer from "@/components/layouts/Footer";
-import { Navbar } from "@/components/layouts/Navbar";
-import { SmoothScroll } from "@/components/providers/SmoothScroll";
-import { ScrollColorProvider } from "@/components/providers/ScrollColorContext";
-import { ColorSection } from "@/components/providers/ColorSection";
-import { BackgroundLayer } from "@/components/layouts/BackgroundLayer";
-import { ScrollProgress } from "@/components/layouts/ScrollProgress";
-import { ScrollToTop } from "@/components/layouts/ScrollToTop";
+import { Routes, Route } from "react-router-dom";
+import MainLayout from "@/layouts/MainLayout";
 
-export default function AppRouter() {
+import HomePage from "@/pages/HomePage";
+import AboutPage from "@/pages/AboutPage";
+import ProjectsPage from "@/pages/ProjectsPage";
+import ProjectDetailPage from "@/pages/ProjectsDetailsPage";
+import ContactPage from "@/pages/ContactPage";
+import ConsultationPage from "@/pages/ConsultationPage";
+import BlogPage from "@/pages/BlogPage";
+import Quiz from "@/pages/Quiz";
+import NotFound from "@/pages/NotFound";
+
+export default function AppRoutes() {
   return (
-    <SmoothScroll>
-      <ScrollColorProvider>
-        <BackgroundLayer />
-        <ScrollProgress />
-        <ScrollToTop />
-        <Navbar />
-
-        <ColorSection color="#ffffff">
-          <Hero />
-        </ColorSection>
-
-        <ColorSection color="#ffffff">
-          <Partner />
-        </ColorSection>
-
-        <ColorSection color="#ffffff">
-          <About />
-        </ColorSection>
-
-        <ColorSection color="#000000">
-          <Work />
-        </ColorSection>
-
-        <ColorSection color="#F8F9FA">
-          <Service />
-        </ColorSection>
-
-        <ColorSection color="#ffffff">
-          <Pricing />
-        </ColorSection>
-
-        <ColorSection color="#000000">
-          <Testimonials />
-        </ColorSection>
-
-        <ColorSection color="#FBFAF8">
-          <HowIWork />
-        </ColorSection>
-
-        <ColorSection color="#000000">
-          <CTA />
-        </ColorSection>
-
-        <ColorSection color="#000000">
-          <Footer />
-        </ColorSection>
-      </ScrollColorProvider>
-    </SmoothScroll>
+    <Routes>
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<HomePage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route path="projects" element={<ProjectsPage />} />
+        <Route path="projects/:slug" element={<ProjectDetailPage />} />
+        <Route path="contact" element={<ContactPage />} />
+        <Route path="book-a-session" element={<ConsultationPage />} />
+        <Route path="blog" element={<BlogPage />} />
+        <Route path="quiz" element={<Quiz />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   );
 }

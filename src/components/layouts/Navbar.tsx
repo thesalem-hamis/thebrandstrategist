@@ -322,169 +322,103 @@
 
 
 import { useState } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowUpRight } from "lucide-react";
 import logo from "@/assets/logo.svg";
 
 const NAV_LINKS = [
-  { label: "ABOUT", href: "#about" },
-  { label: "SERVICES", href: "#services" },
-  { label: "PORTFOLIO", href: "#portfolio" },
-  { label: "RESOURCES", href: "#resources" },
+  { label: "ABOUT", href: "/about" },
+  { label: "SERVICES", href: "/#services" },
+  { label: "PROJECTS", href: "/projects" },
+  { label: "RESOURCES", href: "/#resources" },
 ];
 
-// Define the ease as a valid Framer Motion ease type
 const REVEAL_EASE: [number, number, number, number] = [0.76, 0, 0.24, 1];
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isHomePage = location.pathname === "/";
+
+  // Dynamic link text colors for desktop based on route background
+  const textColor = isHomePage
+    ? "text-white/90 hover:text-white"
+    : "text-neutral-900/90 hover:text-neutral-900";
+
+  // Smooth mobile menu close animation before page transition
+  const handleMobileNavigate = (targetHref: string) => {
+    setMenuOpen(false);
+    setTimeout(() => {
+      if (targetHref.startsWith("/#")) {
+        const elementId = targetHref.replace("/#", "");
+        if (location.pathname === "/") {
+          const el = document.getElementById(elementId);
+          el?.scrollIntoView({ behavior: "smooth" });
+        } else {
+          navigate("/");
+          setTimeout(() => {
+            const el = document.getElementById(elementId);
+            el?.scrollIntoView({ behavior: "smooth" });
+          }, 300);
+        }
+      } else {
+        navigate(targetHref);
+      }
+    }, 450); // Matches exit animation duration window
+  };
 
   return (
     <>
-      {/* =====================================================
-          DESKTOP NAVBAR
-      ====================================================== */}
-      <header className="absolute top-[-10px] left-0 right-0 z-50 flex justify-center px-5 pointer-events-none">
-        <div
-          className="
-            pointer-events-auto
-            flex
-            w-full
-            items-center
-            justify-between
-            px-2
-            py-2
-            sm:w-auto
-            sm:justify-start
-          "
-        >
-          {/* =================================================
-              LOGO
-          ================================================== */}
-          <a
-            href="#"
-            className="
-              flex
-              shrink-0
-              items-center
-              transition-transform
-              duration-200
-              hover:scale-[1.03]
-              sm:mr-9
-            "
+      {/* DESKTOP & MOBILE HEADER */}
+      <header className="absolute top-0 left-0 right-0 z-50 flex justify-center px-4 sm:px-8 py-3 pointer-events-none">
+        <div className="pointer-events-auto flex w-full max-w-7xl items-center justify-between">
+          
+          {/* LOGO - Far Left on Mobile & Desktop */}
+          <Link
+            to="/"
+            className="flex shrink-0 items-center transition-transform duration-200 hover:scale-[1.03]"
           >
             <img
               src={logo}
               alt="The Brand Strategist"
-              className="
-                h-[90px]
-                w-auto
-                object-contain
-                sm:h-[88px]
-                md:h-[104px]
-              "
+              className="h-[70px] sm:h-[88px] md:h-[104px] w-auto object-contain"
             />
-          </a>
+          </Link>
 
-          {/* =================================================
-              DESKTOP NAVIGATION
-          ================================================== */}
+          {/* DESKTOP NAVIGATION */}
           <nav className="hidden sm:flex items-center gap-[30px] md:gap-[34px]">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="
-                  whitespace-nowrap
-                  text-[10px]
-                  md:text-[11px]
-                  font-medium
-                  tracking-[0.04em]
-                  text-white/90
-                  transition-colors
-                  duration-200
-                  hover:text-white
-                "
+                className={`whitespace-nowrap text-[10px] md:text-[11px] font-medium tracking-[0.04em] transition-colors duration-200 ${textColor}`}
               >
                 {link.label}
               </a>
             ))}
           </nav>
 
-          {/* =================================================
-              DESKTOP CTA
-          ================================================== */}
+          {/* DESKTOP CTA */}
           <motion.a
-            href="#contact"
-            whileHover={{
-              scale: 1.03,
-            }}
-            whileTap={{
-              scale: 0.97,
-            }}
-            transition={{
-              duration: 0.2,
-              ease: "easeInOut",
-            }}
-            className="
-              hidden
-              sm:flex
-              items-center
-              justify-center
-              ml-9
-              h-auto
-              rounded-full
-              bg-[#5D1F17]
-              px-4
-              py-2
-              md:px-[18px]
-              md:py-[9px]
-              text-[10px]
-              md:text-[11px]
-              font-semibold
-              tracking-[0.02em]
-              text-white
-              uppercase
-              whitespace-nowrap
-              shadow-md
-              transition-colors
-              duration-200
-              hover:bg-[#4a1812]
-            "
+            href="/#contact"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="hidden sm:flex items-center justify-center ml-9 h-auto rounded-full bg-[#5D1F17] px-4 py-2 md:px-[18px] md:py-[9px] text-[10px] md:text-[11px] font-semibold tracking-[0.02em] text-white uppercase whitespace-nowrap shadow-md transition-colors duration-200 hover:bg-[#4a1812]"
           >
             BOOK A CONSULTATION
-
-            <ArrowUpRight
-              className="
-                ml-1.5
-                h-3
-                w-3
-                md:h-3.5
-                md:w-3.5
-              "
-            />
+            <ArrowUpRight className="ml-1.5 h-3 w-3 md:h-3.5 md:w-3.5" />
           </motion.a>
 
-          {/* =================================================
-              MOBILE MENU BUTTON
-          ================================================== */}
+          {/* MOBILE MENU BUTTON - Far Right on Mobile */}
           <button
             type="button"
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             onClick={() => setMenuOpen(!menuOpen)}
-            className="
-              relative
-              z-[70]
-              flex
-              sm:hidden
-              h-11
-              w-11
-              items-center
-              justify-center
-              transition-colors
-              duration-200
-              hover:text-[#4a1812]
-            "
+            className="relative z-[70] flex sm:hidden h-11 w-11 items-center justify-center transition-colors duration-200 hover:text-[#4a1812]"
           >
             <AnimatePresence mode="wait" initial={false}>
               {menuOpen ? (
@@ -493,10 +427,7 @@ export function Navbar() {
                   initial={{ rotate: -90, opacity: 0 }}
                   animate={{ rotate: 0, opacity: 1 }}
                   exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ 
-                    duration: 0.25, 
-                    ease: REVEAL_EASE 
-                  }}
+                  transition={{ duration: 0.25, ease: REVEAL_EASE }}
                   className="flex items-center justify-center text-white"
                 >
                   <X className="h-6 w-6" />
@@ -507,10 +438,7 @@ export function Navbar() {
                   initial={{ rotate: 90, opacity: 0 }}
                   animate={{ rotate: 0, opacity: 1 }}
                   exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ 
-                    duration: 0.25, 
-                    ease: REVEAL_EASE 
-                  }}
+                  transition={{ duration: 0.25, ease: REVEAL_EASE }}
                   className="flex items-center justify-center text-[#5D1F17]"
                 >
                   <Menu className="h-6 w-6" />
@@ -521,178 +449,76 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* =====================================================
-          MOBILE MENU — CIRCULAR REVEAL
-      ====================================================== */}
+      {/* MOBILE MENU — CIRCULAR REVEAL */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ clipPath: "circle(2% at calc(100% - 38px) 38px)" }}
             animate={{ clipPath: "circle(150% at calc(100% - 38px) 38px)" }}
             exit={{ clipPath: "circle(2% at calc(100% - 38px) 38px)" }}
-            transition={{ 
-              duration: 0.7, 
-              ease: REVEAL_EASE 
-            }}
-            className="
-              fixed
-              inset-0
-              z-[60]
-              flex
-              flex-col
-              justify-between
-              overflow-hidden
-              bg-[#111111]
-              p-7
-              text-white
-              sm:hidden
-            "
+            transition={{ duration: 0.6, ease: REVEAL_EASE }}
+            className="fixed inset-0 z-[60] flex flex-col justify-between overflow-hidden bg-[#111111] p-7 text-white sm:hidden"
           >
-            {/* =================================================
-                MENU HEADER
-            ================================================== */}
+            {/* MOBILE MENU HEADER */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ 
-                duration: 0.3, 
-                delay: 0.15,
-                ease: "easeOut" 
-              }}
-              className="
-                flex
-                items-center
-                justify-between
-                border-b
-                border-white/10
-                pb-7
-              "
+              transition={{ duration: 0.3, delay: 0.15, ease: "easeOut" }}
+              className="flex items-center justify-between border-b border-white/10 pb-7"
             >
-              <a
-                href="#"
-                onClick={() => setMenuOpen(false)}
+              <button
+                type="button"
+                onClick={() => handleMobileNavigate("/")}
                 className="flex items-center"
               >
                 <img
                   src={logo}
                   alt="The Brand Strategist"
-                  className="
-                    h-14
-                    w-auto
-                    object-contain
-                    brightness-0
-                    invert
-                  "
+                  className="h-14 w-auto object-contain"
                 />
-              </a>
+              </button>
 
               <button
                 type="button"
                 aria-label="Close menu"
                 onClick={() => setMenuOpen(false)}
-                className="
-                  flex
-                  h-12
-                  w-12
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-white/10
-                  text-white
-                  transition-colors
-                  duration-200
-                  hover:bg-white/20
-                "
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-white transition-colors duration-200 hover:bg-white/20"
               >
                 <X className="h-6 w-6" />
               </button>
             </motion.div>
 
-            {/* =================================================
-                MOBILE NAVIGATION
-            ================================================== */}
+            {/* MOBILE NAVIGATION */}
             <div className="my-auto flex flex-col gap-7 py-12">
               {NAV_LINKS.map((link, index) => (
-                <motion.a
+                <motion.button
                   key={link.label}
-                  href={link.href}
-                  initial={{
-                    opacity: 0,
-                    x: 25,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    x: 0,
-                  }}
-                  transition={{
-                    delay: 0.1 + index * 0.06,
-                    ease: "easeOut",
-                  }}
-                  onClick={() => setMenuOpen(false)}
-                  className="
-                    text-4xl
-                    font-light
-                    uppercase
-                    tracking-wide
-                    text-white/80
-                    transition-colors
-                    duration-200
-                    hover:text-white
-                  "
+                  type="button"
+                  initial={{ opacity: 0, x: 25 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + index * 0.06, ease: "easeOut" }}
+                  onClick={() => handleMobileNavigate(link.href)}
+                  className="text-left text-4xl font-light uppercase tracking-wide text-white/80 transition-colors duration-200 hover:text-white"
                 >
                   {link.label}
-                </motion.a>
+                </motion.button>
               ))}
             </div>
 
-            {/* =================================================
-                MOBILE CTA
-            ================================================== */}
-            <div
-              className="
-                border-t
-                border-white/10
-                pt-7
-              "
-            >
-              <motion.a
-                href="#contact"
-                whileHover={{
-                  scale: 1.01,
-                }}
-                whileTap={{
-                  scale: 0.98,
-                }}
-                transition={{
-                  duration: 0.2,
-                  ease: "easeInOut",
-                }}
-                onClick={() => setMenuOpen(false)}
-                className="
-                  flex
-                  w-full
-                  items-center
-                  justify-center
-                  gap-2
-                  rounded-full
-                  bg-[#5D1F17]
-                  py-5
-                  text-sm
-                  font-semibold
-                  uppercase
-                  tracking-wider
-                  text-white
-                  shadow-xl
-                  transition-colors
-                  duration-200
-                  hover:bg-[#4a1812]
-                "
+            {/* MOBILE CTA */}
+            <div className="border-t border-white/10 pt-7">
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                onClick={() => handleMobileNavigate("/#contact")}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-[#5D1F17] py-5 text-sm font-semibold uppercase tracking-wider text-white shadow-xl transition-colors duration-200 hover:bg-[#4a1812]"
               >
                 BOOK A CONSULTATION
-
                 <ArrowUpRight className="h-5 w-5" />
-              </motion.a>
+              </motion.button>
             </div>
           </motion.div>
         )}

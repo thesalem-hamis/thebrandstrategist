@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-// import heroImage from "@/assets/main.png";
 import heroImage from "@/assets/Mainn.png";
 
 export function Hero() {
