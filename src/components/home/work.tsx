@@ -226,7 +226,7 @@ export function Work() {
             </p>
 
             <a
-              href="#case-studies"
+              href="/projects"
               className="group inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-white hover:text-neutral-300 transition-colors duration-300"
             >
               <span>VIEW ALL CASE STUDIES</span>

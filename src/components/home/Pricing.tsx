@@ -12,7 +12,7 @@ interface PricingPlan {
 
 const pricingPlans: PricingPlan[] = [
   {
-    price: "$100,000",
+    price: "$100/hr",
     title: "One on One Consultation",
     description: "The strategic starting point.",
     features: [
@@ -23,7 +23,7 @@ const pricingPlans: PricingPlan[] = [
     ],
     highlighted: true,
     buttonText: "Book Session",
-    buttonLink: "#contact",
+    buttonLink: "/book-a-session",
   },
   {
     price: "$2,000",

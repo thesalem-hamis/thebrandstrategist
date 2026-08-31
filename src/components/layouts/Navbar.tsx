@@ -329,9 +329,9 @@ import logo from "@/assets/logo.svg";
 
 const NAV_LINKS = [
   { label: "ABOUT", href: "/about" },
-  { label: "SERVICES", href: "/#services" },
+  { label: "SERVICES", href: "/services" },
   { label: "PROJECTS", href: "/projects" },
-  { label: "RESOURCES", href: "/#resources" },
+  { label: "RESOURCES", href: "/resources" },
 ];
 
 const REVEAL_EASE: [number, number, number, number] = [0.76, 0, 0.24, 1];
@@ -403,7 +403,7 @@ export function Navbar() {
 
           {/* DESKTOP CTA */}
           <motion.a
-            href="/#contact"
+            href="/book-a-session"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
