@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom", "dom.iterable", "dom.asynciterable"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  },
+  "imports": {
+    "preact": "https://esm.sh/preact@10.22.1",
+    "preact/": "https://esm.sh/preact@10.22.1/",
+    "preact-render-to-string": "https://esm.sh/preact-render-to-string@6.5.1",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.3",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.6.1",
+    "twind": "https://esm.sh/twind@0.16.19",
+    "twind/": "https://esm.sh/twind@0.16.19/",
+    "$fresh/": "https://deno.land/x/fresh@1.6.8/",
+    "supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "stripe": "https://esm.sh/stripe@11.2.0?target=deno",
+    "cors": "https://deno.land/x/edge_cors@v1.0.1/mod.ts"
+  }
+}

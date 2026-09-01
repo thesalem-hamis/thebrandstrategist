@@ -1,0 +1,7 @@
+{
+  "extends": "../../../deno.json",
+  "compilerOptions": {
+    "types": ["../../types/edge-runtime.d.ts"]
+  },
+  "include": ["index.ts", "../../types/**/*.d.ts"]
+}

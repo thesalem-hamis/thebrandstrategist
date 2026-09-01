@@ -1,0 +1,8 @@
+{
+  "extends": "../../../deno.json",
+  "compilerOptions": {
+    "types": [],
+    "noCheck": true
+  },
+  "include": ["index.ts"]
+}
