@@ -7,10 +7,27 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+.pnp
+.pnp.js
+
+# Build outputs
 dist
 dist-ssr
+build
 *.local
+
+# Testing
+coverage
+.nyc_output
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +39,35 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Supabase
+supabase/.temp
+supabase/.branches
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Vite
+vite.config.ts.timestamp-*
+.vite
+
+# Cache
+.cache
+.temp
+.tmp
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Debug
+debug.log
+
+# Optional: Remove if you want to commit your lock file
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Optional: Remove if you want to commit your environment files
+# .env.example
