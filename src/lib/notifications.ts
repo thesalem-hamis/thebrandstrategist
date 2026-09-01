@@ -80,6 +80,7 @@ export function useDashboardNotifications() {
             body: `${c.client_name} booked a session for ${c.session_date} at ${c.session_time}.`,
             href: "/dashboard/consultations",
             created_at: c.created_at,
+            read: false,
           });
         }
       )
@@ -95,6 +96,7 @@ export function useDashboardNotifications() {
               body: `${c.client_name} just paid $${(c.amount / 100).toFixed(0)} ${c.currency}.`,
               href: "/dashboard/consultations",
               created_at: c.created_at ?? new Date().toISOString(),
+              read: false,
             });
           }
         }
@@ -110,6 +112,7 @@ export function useDashboardNotifications() {
             body: `${i.name} is interested in ${i.service}.`,
             href: "/dashboard/inquiries",
             created_at: i.created_at ?? new Date().toISOString(),
+            read: false,
           });
         }
       )
@@ -124,6 +127,7 @@ export function useDashboardNotifications() {
             body: p.title,
             href: "/dashboard/blog",
             created_at: p.created_at ?? new Date().toISOString(),
+            read: false,
           });
         }
       )

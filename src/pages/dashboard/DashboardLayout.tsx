@@ -1,5 +1,5 @@
 ﻿import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -13,10 +13,8 @@ import {
   Bell,
   Search,
   Sparkles,
-  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { useDashboardNotifications } from "@/lib/notifications";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true, badge: null },
