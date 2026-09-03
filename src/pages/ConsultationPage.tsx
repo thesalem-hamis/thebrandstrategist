@@ -51,6 +51,7 @@ export default function ConsultationPage() {
   const [paymentReference, setPaymentReference] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [feeUsd, setFeeUsd] = useState(CONSULTATION_FEE_USD);
+  const [paymentCurrency, setPaymentCurrency] = useState<string>("USD");
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -78,25 +79,30 @@ export default function ConsultationPage() {
     setStep("payment");
   };
 
-  // Fetch the live consultation fee from site settings (fallback: $100)
+  // Fetch the live consultation fee and currency from site settings
   useEffect(() => {
-    const fetchFee = async () => {
+    const fetchSettings = async () => {
       try {
         const { data } = await supabase
           .from("site_settings")
-          .select("value")
-          .eq("key", "consultation_fee_usd")
-          .maybeSingle();
-        
-        if (data?.value && !isNaN(Number(data.value))) {
-          setFeeUsd(Number(data.value));
+          .select("key, value")
+          .in("key", ["consultation_fee_usd", "payment_currency"]);
+
+        const rows = (data ?? []) as { key: string; value: string }[];
+        for (const row of rows) {
+          if (row.key === "consultation_fee_usd" && !isNaN(Number(row.value))) {
+            setFeeUsd(Number(row.value));
+          }
+          if (row.key === "payment_currency" && row.value.trim()) {
+            setPaymentCurrency(row.value.trim().toUpperCase());
+          }
         }
       } catch (err) {
-        console.warn("Failed to fetch consultation fee:", err);
+        console.warn("Failed to fetch consultation settings:", err);
       }
     };
-    
-    fetchFee();
+
+    fetchSettings();
   }, []);
 
   const handlePaystackPayment = async () => {
@@ -130,8 +136,8 @@ export default function ConsultationPage() {
           notes: form.notes?.trim() || null,
           session_date: sessionDate,
           session_time: selectedTime,
-          amount: feeUsd * 100, // Store in cents
-          currency: "USD",
+          amount: feeUsd * 100,
+          currency: paymentCurrency,
           status: "pending",
           zoom_link_sent: false,
         })
@@ -154,7 +160,7 @@ export default function ConsultationPage() {
         email: form.email,
         amount: paystackAmount,
         reference,
-        currency: "USD",
+        currency: paymentCurrency,
       });
 
       // Launch Paystack checkout
@@ -163,7 +169,7 @@ export default function ConsultationPage() {
         amount: paystackAmount,
         reference,
         name: form.name.trim(),
-        currency: "USD",
+        currency: paymentCurrency,
         metadata: {
           consultation_id: consultation.id,
           session_date: sessionDate,
@@ -428,7 +434,7 @@ export default function ConsultationPage() {
                     </div>
                     <div className="flex justify-between border-b border-zinc-200 pb-3">
                       <span className="font-semibold text-neutral-400 uppercase tracking-wide">Fee</span>
-                      <span className="font-medium text-neutral-900">${feeUsd} USD</span>
+                      <span className="font-medium text-neutral-900">${feeUsd} {paymentCurrency}</span>
                     </div>
                   </div>
 
@@ -560,7 +566,7 @@ export default function ConsultationPage() {
                         <CreditCard className="w-3.5 h-3.5" />
                         Session Fee
                       </span>
-                      <span className="font-semibold text-neutral-900">${feeUsd} USD</span>
+                      <span className="font-semibold text-neutral-900">${feeUsd} {paymentCurrency}</span>
                     </div>
                   </div>
 

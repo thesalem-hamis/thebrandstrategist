@@ -23,12 +23,13 @@ interface SettingsStats {
 export default function DashboardSettings() {
   const [zoomLink, setZoomLink] = useState("");
   const [fee, setFee] = useState("100");
+  const [paymentCurrency, setPaymentCurrency] = useState("USD");
   const [contactEmail, setContactEmail] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
   const [stats, setStats] = useState<SettingsStats>({
-    total: 3,
+    total: 4,
     configured: 0,
     lastUpdated: null,
   });
@@ -49,14 +50,16 @@ export default function DashboardSettings() {
         
         const zoomValue = map.zoom_link ?? "";
         const feeValue = map.consultation_fee_usd ?? "100";
+        const currencyValue = map.payment_currency ?? "USD";
         const emailValue = map.contact_email ?? "";
         
         setZoomLink(zoomValue);
         setFee(feeValue);
+        setPaymentCurrency(currencyValue);
         setContactEmail(emailValue);
         
         // Calculate stats
-        const configuredCount = [zoomValue, feeValue, emailValue].filter(
+        const configuredCount = [zoomValue, feeValue, currencyValue, emailValue].filter(
           (v) => v && v.trim() !== ""
         ).length;
         
@@ -104,6 +107,7 @@ export default function DashboardSettings() {
       const updates = [
         { key: "zoom_link", value: zoomLink.trim() },
         { key: "consultation_fee_usd", value: String(feeValue) },
+        { key: "payment_currency", value: paymentCurrency.trim() },
         { key: "contact_email", value: contactEmail.trim() },
       ];
 
@@ -119,7 +123,7 @@ export default function DashboardSettings() {
       }
 
       // Update stats
-      const configuredCount = [zoomLink.trim(), String(feeValue), contactEmail.trim()].filter(
+      const configuredCount = [zoomLink.trim(), String(feeValue), paymentCurrency.trim(), contactEmail.trim()].filter(
         (v) => v && v.trim() !== ""
       ).length;
       
@@ -317,6 +321,32 @@ export default function DashboardSettings() {
                 <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0 text-emerald-600" />
                 <p className="text-[11px] leading-relaxed text-emerald-700">
                   Charged via Paystack at checkout. Changes apply to new bookings immediately.
+                </p>
+              </div>
+            </div>
+
+            {/* Payment Currency */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">
+                <DollarSign className="h-3.5 w-3.5" />
+                Payment Currency
+              </label>
+              <select
+                value={paymentCurrency}
+                onChange={(e) => setPaymentCurrency(e.target.value)}
+                className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-all duration-300 focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+              >
+                <option value="USD">USD — US Dollar</option>
+                <option value="NGN">NGN — Nigerian Naira</option>
+                <option value="GHS">GHS — Ghanaian Cedi</option>
+                <option value="KES">KES — Kenyan Shilling</option>
+                <option value="ZAR">ZAR — South African Rand</option>
+              </select>
+              <div className="mt-2 flex items-start gap-2 rounded-lg bg-amber-50/50 p-3">
+                <Shield className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-600" />
+                <p className="text-[11px] leading-relaxed text-amber-700">
+                  Must match a currency enabled on your Paystack account. Switch to NGN if USD
+                  transactions are failing.
                 </p>
               </div>
             </div>

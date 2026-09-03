@@ -35,12 +35,21 @@ interface ConsultationRow {
   zoom_link_sent?: boolean;
 }
 
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  NGN: "₦",
+  GHS: "GH₵",
+  KES: "KSh",
+  ZAR: "R",
+};
+
 interface SiteSetting {
   key: string;
   value: string;
 }
 
 function buildEmailHtml(c: ConsultationRow, zoomLink: string): string {
+  const symbol = CURRENCY_SYMBOLS[c.currency] ?? c.currency;
   const amountDisplay = (c.amount / 100).toFixed(0);
   return `
   <!DOCTYPE html>
@@ -55,7 +64,7 @@ function buildEmailHtml(c: ConsultationRow, zoomLink: string): string {
           <div style="padding:32px;">
             <p style="margin:0 0 16px;color:#333;font-size:15px;line-height:1.6;">Dear ${c.client_name},</p>
             <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.7;">
-              Thank you — your payment of <strong>$${amountDisplay} ${c.currency}</strong> was received successfully.
+              Thank you — your payment of <strong>${symbol}${amountDisplay} ${c.currency}</strong> was received successfully.
               Your 1-on-1 strategy consultation with Bimpe Mohammed is confirmed.
             </p>
             <table style="width:100%;border-collapse:collapse;margin:0 0 24px;font-family:Arial,sans-serif;">

@@ -2,6 +2,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth";
 
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  NGN: "₦",
+  GHS: "GH₵",
+  KES: "KSh",
+  ZAR: "R",
+};
+
 export interface Notification {
   id: string;
   title: string;
@@ -90,10 +98,11 @@ export function useDashboardNotifications() {
         (payload) => {
           const c: any = payload.new;
           if (c.status === "paid") {
+            const symbol = CURRENCY_SYMBOLS[c.currency] ?? c.currency;
             push({
               id: `c-${c.id}-paid-${Date.now()}`,
               title: "Payment received 💸",
-              body: `${c.client_name} just paid $${(c.amount / 100).toFixed(0)} ${c.currency}.`,
+              body: `${c.client_name} just paid ${symbol}${(c.amount / 100).toFixed(0)} ${c.currency}.`,
               href: "/dashboard/consultations",
               created_at: c.created_at ?? new Date().toISOString(),
               read: false,
