@@ -9,9 +9,11 @@ import {
   ArrowUp,
   TrendingUp,
   Clock,
+  ShoppingBag,
+  ClipboardList,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import type { Consultation, ServiceInquiry } from "@/lib/types";
+import type { Consultation, ServiceInquiry, Order, ServiceRequest } from "@/lib/types";
 
 interface Stats {
   paidConsultations: number;
@@ -20,6 +22,9 @@ interface Stats {
   publishedPosts: number;
   draftPosts: number;
   newInquiries: number;
+  totalOrders: number;
+  paidOrders: number;
+  pendingRequests: number;
 }
 
 export default function DashboardOverview() {
@@ -30,15 +35,20 @@ export default function DashboardOverview() {
     publishedPosts: 0,
     draftPosts: 0,
     newInquiries: 0,
+    totalOrders: 0,
+    paidOrders: 0,
+    pendingRequests: 0,
   });
   const [recent, setRecent] = useState<Consultation[]>([]);
   const [recentInquiries, setRecentInquiries] = useState<ServiceInquiry[]>([]);
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  const [recentRequests, setRecentRequests] = useState<ServiceRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
-      const [consultRes, blogRes, inquiryRes, recentRes, recentInqRes] = await Promise.all([
+      const [consultRes, blogRes, inquiryRes, recentRes, recentInqRes, orderRes, recentOrderRes, reqRes, recentReqRes] = await Promise.all([
         supabase.from("consultations").select("status, amount"),
         supabase.from("blog_posts").select("published"),
         supabase.from("service_inquiries").select("status"),
@@ -52,11 +62,25 @@ export default function DashboardOverview() {
           .select("*")
           .order("created_at", { ascending: false })
           .limit(4),
+        supabase.from("orders").select("order_status, payment_status, total_amount"),
+        supabase
+          .from("orders")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase.from("service_requests").select("request_status"),
+        supabase
+          .from("service_requests")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(4),
       ]);
 
       const consultations = (consultRes.data ?? []) as { status: string; amount: number }[];
       const posts = (blogRes.data ?? []) as { published: boolean }[];
       const inquiries = (inquiryRes.data ?? []) as { status: string }[];
+      const orders = (orderRes.data ?? []) as { order_status: string; payment_status: string; total_amount: number }[];
+      const requests = (reqRes.data ?? []) as { request_status: string }[];
 
       setStats({
         paidConsultations: consultations.filter((c) => c.status === "paid").length,
@@ -67,9 +91,14 @@ export default function DashboardOverview() {
         publishedPosts: posts.filter((p) => p.published).length,
         draftPosts: posts.filter((p) => !p.published).length,
         newInquiries: inquiries.filter((i) => i.status === "new").length,
+        totalOrders: orders.length,
+        paidOrders: orders.filter((o) => o.payment_status === "paid").length,
+        pendingRequests: requests.filter((r) => r.request_status === "new").length,
       });
       setRecent((recentRes.data ?? []) as Consultation[]);
       setRecentInquiries((recentInqRes.data ?? []) as ServiceInquiry[]);
+      setRecentOrders((recentOrderRes.data ?? []) as unknown as Order[]);
+      setRecentRequests((recentReqRes.data ?? []) as unknown as ServiceRequest[]);
       setLoading(false);
     }
     load();
@@ -117,6 +146,24 @@ export default function DashboardOverview() {
       accent: "from-blue-500/15 to-blue-500/0",
       iconBg: "bg-blue-500/10 text-blue-700",
       to: "/dashboard/inquiries",
+    },
+    {
+      label: "Orders",
+      value: stats.totalOrders,
+      sub: `${stats.paidOrders} paid`,
+      icon: ShoppingBag,
+      accent: "from-purple-500/15 to-purple-500/0",
+      iconBg: "bg-purple-500/10 text-purple-700",
+      to: "/dashboard/orders",
+    },
+    {
+      label: "Service Requests",
+      value: stats.pendingRequests,
+      sub: "Awaiting first contact",
+      icon: ClipboardList,
+      accent: "from-[#5D1F17]/15 to-[#5D1F17]/0",
+      iconBg: "bg-[#5D1F17]/10 text-[#5D1F17]",
+      to: "/dashboard/service-requests",
     },
   ];
 
@@ -303,6 +350,84 @@ export default function DashboardOverview() {
               </ul>
             )}
           </div>
+
+          {/* Latest orders */}
+          <div className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white">
+            <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-3.5">
+              <h3 className="text-sm font-semibold tracking-tight">Recent Orders</h3>
+              <Link
+                to="/dashboard/orders"
+                className="text-[10px] font-bold uppercase tracking-wider text-[#5D1F17]"
+              >
+                View
+              </Link>
+            </div>
+            {loading ? (
+              <div className="px-5 py-8 text-center text-xs text-neutral-400">Loading…</div>
+            ) : recentOrders.length === 0 ? (
+              <p className="px-5 py-8 text-center text-[11px] text-neutral-400">
+                No orders yet
+              </p>
+            ) : (
+              <ul className="divide-y divide-neutral-100">
+                {recentOrders.map((o) => (
+                  <li key={o.id} className="px-5 py-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-xs font-semibold text-neutral-900">
+                        {o.order_number}
+                      </p>
+                      <span className="truncate rounded-full bg-[#5D1F17]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[#5D1F17]">
+                        {o.order_status}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 flex items-center gap-1 text-[10px] text-neutral-500">
+                      <Clock className="h-2.5 w-2.5" />
+                      ${((o.total_amount ?? 0) / 100).toFixed(0)} · {new Date(o.created_at).toLocaleDateString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Latest service requests */}
+          <div className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white">
+            <div className="flex items-center justify-between border-b border-neutral-100 px-5 py-3.5">
+              <h3 className="text-sm font-semibold tracking-tight">Recent Requests</h3>
+              <Link
+                to="/dashboard/service-requests"
+                className="text-[10px] font-bold uppercase tracking-wider text-[#5D1F17]"
+              >
+                View
+              </Link>
+            </div>
+            {loading ? (
+              <div className="px-5 py-8 text-center text-xs text-neutral-400">Loading…</div>
+            ) : recentRequests.length === 0 ? (
+              <p className="px-5 py-8 text-center text-[11px] text-neutral-400">
+                No requests yet
+              </p>
+            ) : (
+              <ul className="divide-y divide-neutral-100">
+                {recentRequests.map((r) => (
+                  <li key={r.id} className="px-5 py-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="truncate text-xs font-semibold text-neutral-900">
+                        {r.client_name}
+                      </p>
+                      <span className="truncate rounded-full bg-blue-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-blue-700">
+                        {r.request_status}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 flex items-center gap-1 text-[10px] text-neutral-500">
+                      <Clock className="h-2.5 w-2.5" />
+                      {new Date(r.created_at).toLocaleDateString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -319,7 +444,7 @@ function Mini({ label, value }: { label: string; value: number }) {
 }
 
 export function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, string> = {
+   const map: Record<string, string> = {
     paid: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
     pending: "bg-amber-50 text-amber-700 ring-amber-200/60",
     failed: "bg-red-50 text-red-600 ring-red-200/60",
@@ -328,6 +453,12 @@ export function StatusBadge({ status }: { status: string }) {
     closed: "bg-neutral-100 text-neutral-500 ring-neutral-200/60",
     live: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
     draft: "bg-neutral-100 text-neutral-500 ring-neutral-200/60",
+    processing: "bg-amber-50 text-amber-700 ring-amber-200/60",
+    shipped: "bg-blue-50 text-blue-700 ring-blue-200/60",
+    delivered: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
+    cancelled: "bg-red-50 text-red-600 ring-red-200/60",
+    completed: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
+    confirmed: "bg-emerald-50 text-emerald-700 ring-emerald-200/60",
   };
   const cls = map[status] ?? "bg-neutral-100 text-neutral-500 ring-neutral-200/60";
   return (

@@ -13,12 +13,18 @@ import {
   Bell,
   Search,
   Sparkles,
+  ShoppingBag,
+  ClipboardList,
+  BookOpen,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true, badge: null },
   { to: "/dashboard/consultations", label: "Consultations", icon: CalendarDays, badge: "Bookings" },
+  { to: "/dashboard/orders", label: "Orders", icon: ShoppingBag, badge: null },
+  { to: "/dashboard/service-requests", label: "Service Requests", icon: ClipboardList, badge: "Leads" },
+  { to: "/dashboard/books", label: "Books", icon: BookOpen, badge: null },
   { to: "/dashboard/blog", label: "Blog Posts", icon: FileText, badge: null },
   { to: "/dashboard/inquiries", label: "Inquiries", icon: Inbox, badge: "Leads" },
   { to: "/dashboard/settings", label: "Settings", icon: Settings, badge: null },

@@ -330,8 +330,10 @@ import logo from "@/assets/logo.svg";
 const NAV_LINKS = [
   { label: "ABOUT", href: "/about" },
   { label: "SERVICES", href: "/services" },
+  { label: "BOOK", href: "/book" },
   { label: "PROJECTS", href: "/projects" },
-  { label: "RESOURCES", href: "/resources" },
+  { label: "BLOG", href: "/blog" },
+  { label: "RESOURCES", href: "/blog" },
 ];
 
 const REVEAL_EASE: [number, number, number, number] = [0.76, 0, 0.24, 1];

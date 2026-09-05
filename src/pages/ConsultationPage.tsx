@@ -96,7 +96,29 @@ export default function ConsultationPage() {
       }
     };
     
+    
     fetchFee();
+  }, []);
+
+  // Resume verification on mount if a pending reference exists in session storage
+  useEffect(() => {
+    const pendingRef = sessionStorage.getItem("tbs_pending_reference");
+    if (pendingRef && step !== "confirmed" && step !== "pick") {
+      // Check if the consultation for this reference is already paid
+      supabase
+        .from("consultations")
+        .select("status")
+        .eq("reference", pendingRef)
+        .maybeSingle()
+        .then(({ data, error }) => {
+          if (!error && data && data.status === "paid") {
+            setPaymentReference(pendingRef);
+            sessionStorage.removeItem("tbs_pending_reference");
+            sessionStorage.setItem(`tbs_confirmed_${pendingRef}`, "1");
+            setStep("confirmed");
+          }
+        });
+    }
   }, []);
 
   const handlePaystackPayment = async () => {
@@ -125,6 +147,7 @@ export default function ConsultationPage() {
         .from("consultations")
         .insert({
           reference,
+          service_id: "consultation-100",
           client_name: form.name.trim(),
           client_email: form.email.trim(),
           notes: form.notes?.trim() || null,
@@ -145,6 +168,11 @@ export default function ConsultationPage() {
 
       console.log("Booking created:", consultation);
       setPaymentReference(reference);
+
+      // Persist reference so we can resume verification after a tab close.
+      if (reference) {
+        sessionStorage.setItem("tbs_pending_reference", reference);
+      }
 
       // Determine Paystack amount
       // Paystack uses cents for USD
@@ -181,8 +209,20 @@ export default function ConsultationPage() {
             },
           ],
         },
-        onSuccess: async (transaction) => {
+          onSuccess: async (transaction) => {
           console.log("Payment successful:", transaction);
+
+          // Guard against double-resolution (Paystack can fire onSuccess twice)
+          if (transaction?.reference && sessionStorage.getItem(`tbs_confirmed_${transaction.reference}`) === "1") {
+            console.warn("Payment handler called twice — ignoring");
+            setIsProcessing(false);
+            setStep("confirmed");
+            return;
+          }
+          if (reference) {
+            sessionStorage.setItem(`tbs_confirmed_${reference}`, "1");
+          }
+
           try {
             // Verify payment server-side
             const res = await fetch(

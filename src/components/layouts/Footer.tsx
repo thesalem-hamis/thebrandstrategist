@@ -7,10 +7,12 @@ import {
 import logo from "@/assets/logo.svg";
 
 const COMPANY_LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Services", href: "#services" },
-  { label: "Contact", href: "#contact" },
+  { label: "About", href: "/about" },
+  { label: "Portfolio", href: "/projects" },
+  { label: "Services", href: "/services" },
+  { label: "Book", href: "/book" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
 ];
 
 // const RESOURCE_LINKS = [
@@ -323,7 +325,7 @@ export function Footer() {
           <div className="flex gap-6">
 
             <a
-              href="#services"
+              href="/services"
               className="
                 hover:text-[#6B1F3A]
                 transition-colors
@@ -334,7 +336,7 @@ export function Footer() {
             </a>
 
             <a
-              href="#services"
+              href="/services"
               className="
                 hover:text-[#6B1F3A]
                 transition-colors
