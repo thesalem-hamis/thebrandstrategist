@@ -5,9 +5,8 @@ import {
   Trash2,
   X,
   Loader2,
-  BookOpen,
-  ExternalLink,
   CheckCircle2,
+  BookOpen,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { BookProduct } from "@/lib/types";

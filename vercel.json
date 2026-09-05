@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    { "source": "/(.*)", "destination": "/", "missing": [{ "type": "route", "pattern": "^/api(.*)", "status": 404 }] }
   ]
 }
