@@ -62,6 +62,24 @@ END $$;
 
 
 -- ------------------------------------------------------------
+-- 2b. Add client_phone to consultations if missing
+-- ------------------------------------------------------------
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'consultations'
+      AND column_name = 'client_phone'
+  ) THEN
+    ALTER TABLE public.consultations
+      ADD COLUMN client_phone text;
+  END IF;
+END $$;
+
+
+-- ------------------------------------------------------------
 -- 3. Create service_requests table
 -- ------------------------------------------------------------
 create table if not exists public.service_requests (

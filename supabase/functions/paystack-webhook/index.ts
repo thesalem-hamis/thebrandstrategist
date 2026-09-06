@@ -103,7 +103,7 @@ Deno.serve(async (req: Request) => {
 
       // send email via the centralized function (fire-and-forget)
       await fetch(
-        `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-confirmation-email`,
+        `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-confirmation-mail`,
         {
           method: "POST",
           headers: {

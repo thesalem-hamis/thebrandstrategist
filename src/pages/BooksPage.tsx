@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ShoppingCart, ArrowUpRight, BookOpen, Mail } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { launchPaystackCheckout, generateReference } from "@/lib/paystack";
 import type { BookProduct } from "@/lib/types";
 
 export default function BooksPage() {
@@ -13,10 +12,66 @@ export default function BooksPage() {
   const [email, setEmail] = useState("");
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<BookProduct | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     loadProducts();
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get("payment");
+    const reference = params.get("reference");
+
+    if (payment !== "callback" || !reference) return;
+
+    const verifyPayment = async () => {
+      try {
+        setLoading(true);
+
+        const { data, error } =
+          await supabase.functions.invoke("verify-payment", {
+            body: { reference },
+          });
+
+        if (error) {
+          throw new Error(
+            error.message || "Payment verification failed"
+          );
+        }
+
+        if (!data?.success || !data?.paid) {
+          throw new Error(
+            data?.message || "Payment could not be verified"
+          );
+        }
+
+        setPaymentSuccess(true);
+        window.history.replaceState(
+          {},
+          document.title,
+          "/book"
+        );
+      } catch (error) {
+        console.error("Payment verification error:", error);
+        setPaymentError(
+          error instanceof Error
+            ? error.message
+            : "Payment verification failed"
+        );
+        window.history.replaceState(
+          {},
+          document.title,
+          "/book"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyPayment();
   }, []);
 
   async function loadProducts() {
@@ -49,77 +104,35 @@ export default function BooksPage() {
     setPurchasingId(selectedProduct.id);
 
     try {
-      const reference = generateReference();
+      const { data, error } =
+        await supabase.functions.invoke("initialize-payment", {
+          body: {
+            type: "book_order",
+            client_name: "",
+            client_email: customerEmail,
+            client_phone: null,
+            product_id: selectedProduct.id,
+            quantity: 1,
+          },
+        });
 
-      // Create the order record
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          order_number: `ORDER-${reference.slice(-8)}`,
-          product_id: selectedProduct.id,
-          quantity: 1,
-          total_amount: selectedProduct.price,
-          currency: selectedProduct.currency,
-          client_name: "",
-          client_email: customerEmail,
-          client_phone: null,
-          delivery_info: null,
-          payment_status: "pending",
-          order_status: "pending",
-          paystack_reference: reference,
-          email_sent: false,
-        })
-        .select()
-        .single();
+      if (error) {
+        throw new Error(
+          error.message || "Unable to initialize payment"
+        );
+      }
 
-      if (orderError) throw orderError;
+      if (!data?.success) {
+        throw new Error(
+          data?.message || "Unable to initialize payment"
+        );
+      }
 
-      // Launch Paystack inline checkout
-      launchPaystackCheckout({
-        email: customerEmail,
-        amount: selectedProduct.price,
-        reference,
-        name: selectedProduct.title,
-        currency: selectedProduct.currency,
-        metadata: {
-          order_id: order.id,
-          product_title: selectedProduct.title,
-          product_sku: selectedProduct.sku ?? null,
-        },
-        onSuccess: async (transaction) => {
-          const reference = transaction.reference as string;
+      if (!data?.authorization_url) {
+        throw new Error("Paystack checkout URL was not returned");
+      }
 
-          // Verify payment
-          try {
-            await fetch(
-              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-payment`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-                  apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-                },
-                body: JSON.stringify({ reference }),
-              }
-            );
-          } catch (err) {
-            console.warn("Verification pending — webhook will finalize it.", err);
-          }
-
-          setPurchasingId(null);
-          // Show success state
-          setShowEmailPrompt(false);
-          setSelectedProduct(null);
-        },
-        onCancel: () => {
-          setPurchasingId(null);
-        },
-        onError: (error) => {
-          console.error("Payment error:", error);
-          setPurchasingId(null);
-        },
-      });
+      window.location.href = data.authorization_url;
     } catch (err) {
       console.error("Purchase error:", err);
       setPurchasingId(null);
@@ -150,7 +163,19 @@ export default function BooksPage() {
           <p className="mt-4 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-600">
             A practical guide to building a brand that matters. From positioning to implementation.
           </p>
-        </motion.div>
+         </motion.div>
+
+         {paymentError && (
+           <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+             {paymentError}
+           </div>
+         )}
+
+         {paymentSuccess && (
+           <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
+             Your purchase was verified successfully. A confirmation email has been sent.
+           </div>
+         )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">

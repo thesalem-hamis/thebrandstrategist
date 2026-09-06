@@ -16,7 +16,6 @@ import {
   User
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { launchPaystackCheckout, generateReference } from "@/lib/paystack";
 
 const TIME_SLOTS = [
   "9:00 AM", "10:00 AM", "11:00 AM",
@@ -100,25 +99,56 @@ export default function ConsultationPage() {
     fetchFee();
   }, []);
 
-  // Resume verification on mount if a pending reference exists in session storage
+  // Check for Paystack callback with reference in URL query params
   useEffect(() => {
-    const pendingRef = sessionStorage.getItem("tbs_pending_reference");
-    if (pendingRef && step !== "confirmed" && step !== "pick") {
-      // Check if the consultation for this reference is already paid
-      supabase
-        .from("consultations")
-        .select("status")
-        .eq("reference", pendingRef)
-        .maybeSingle()
-        .then(({ data, error }) => {
-          if (!error && data && data.status === "paid") {
-            setPaymentReference(pendingRef);
-            sessionStorage.removeItem("tbs_pending_reference");
-            sessionStorage.setItem(`tbs_confirmed_${pendingRef}`, "1");
-            setStep("confirmed");
-          }
-        });
-    }
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get("payment");
+    const reference = params.get("reference");
+
+    if (payment !== "callback" || !reference) return;
+
+    const verifyPayment = async () => {
+      try {
+        setIsProcessing(true);
+
+        const { data, error } =
+          await supabase.functions.invoke("verify-payment", {
+            body: { reference },
+          });
+
+        if (error) {
+          throw new Error(
+            error.message || "Payment verification failed"
+          );
+        }
+
+        if (!data?.success || !data?.paid) {
+          throw new Error(
+            data?.message || "Payment could not be verified"
+          );
+        }
+
+        setPaymentReference(reference);
+        setStep("confirmed");
+
+        localStorage.removeItem("consultation_reference");
+
+        window.history.replaceState({}, document.title, "/book-a-session");
+      } catch (error) {
+        console.error("Payment verification error:", error);
+        setPaymentError(
+          error instanceof Error ? error.message : "Payment verification failed"
+        );
+      } finally {
+        setIsProcessing(false);
+      }
+    };
+
+    verifyPayment();
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
   }, []);
 
   const handlePaystackPayment = async () => {
@@ -131,136 +161,47 @@ export default function ConsultationPage() {
     setPaymentError(null);
 
     try {
-      const reference = generateReference();
       const sessionDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(selectedDay).padStart(2, "0")}`;
 
-      console.log("Creating booking:", {
-        reference,
-        client_name: form.name,
-        client_email: form.email,
-        session_date: sessionDate,
-        session_time: selectedTime,
-      });
+      const { data, error } =
+        await supabase.functions.invoke("initialize-payment", {
+          body: {
+            type: "consultation",
+            client_name: form.name,
+            client_email: form.email,
+            notes: form.notes,
+            session_date: sessionDate,
+            session_time: selectedTime,
+          },
+        });
 
-      // Insert the consultation record
-      const { data: consultation, error: insertError } = await supabase
-        .from("consultations")
-        .insert({
-          reference,
-          service_id: "consultation-100",
-          client_name: form.name.trim(),
-          client_email: form.email.trim(),
-          notes: form.notes?.trim() || null,
-          session_date: sessionDate,
-          session_time: selectedTime,
-          amount: feeUsd * 100, // Store in cents
-          currency: "USD",
-          status: "pending",
-          zoom_link_sent: false,
-        })
-        .select()
-        .single();
-
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        throw new Error(`Booking failed: ${insertError.message}`);
+      if (error) {
+        throw new Error(
+          error.message || "Unable to initialize payment"
+        );
       }
 
-      console.log("Booking created:", consultation);
-      setPaymentReference(reference);
-
-      // Persist reference so we can resume verification after a tab close.
-      if (reference) {
-        sessionStorage.setItem("tbs_pending_reference", reference);
+      if (!data?.success) {
+        throw new Error(
+          data?.message || "Unable to initialize payment"
+        );
       }
 
-      // Determine Paystack amount
-      // Paystack uses cents for USD
-      const paystackAmount = feeUsd * 100; // $100 = 10000 cents
+      if (!data?.authorization_url) {
+        throw new Error("Paystack checkout URL was not returned");
+      }
 
-      console.log("Launching Paystack with:", {
-        email: form.email,
-        amount: paystackAmount,
-        reference,
-        currency: "USD",
-      });
+      localStorage.setItem(
+        "consultation_reference",
+        data.reference
+      );
 
-      // Launch Paystack checkout
-      launchPaystackCheckout({
-        email: form.email.trim(),
-        amount: paystackAmount,
-        reference,
-        name: form.name.trim(),
-        currency: "USD",
-        metadata: {
-          consultation_id: consultation.id,
-          session_date: sessionDate,
-          session_time: selectedTime,
-          custom_fields: [
-            {
-              display_name: "Session",
-              variable_name: "session",
-              value: `1-on-1 Consultation — ${sessionDate} @ ${selectedTime}`,
-            },
-            {
-              display_name: "Client Name",
-              variable_name: "client_name",
-              value: form.name.trim(),
-            },
-          ],
-        },
-          onSuccess: async (transaction) => {
-          console.log("Payment successful:", transaction);
-
-          // Guard against double-resolution (Paystack can fire onSuccess twice)
-          if (transaction?.reference && sessionStorage.getItem(`tbs_confirmed_${transaction.reference}`) === "1") {
-            console.warn("Payment handler called twice — ignoring");
-            setIsProcessing(false);
-            setStep("confirmed");
-            return;
-          }
-          if (reference) {
-            sessionStorage.setItem(`tbs_confirmed_${reference}`, "1");
-          }
-
-          try {
-            // Verify payment server-side
-            const res = await fetch(
-              `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/verify-payment`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-                  apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-                },
-                body: JSON.stringify({ reference }),
-              }
-            );
-            const json = await res.json();
-            if (!json.success) {
-              console.warn("Verification pending — webhook will finalize it.", json);
-            }
-          } catch (err) {
-            console.warn("Verification call failed — webhook will finalize it.", err);
-          }
-          setIsProcessing(false);
-          setStep("confirmed");
-        },
-        onCancel: () => {
-          console.log("Payment cancelled by user");
-          setIsProcessing(false);
-        },
-        onError: (error) => {
-          console.error("Payment error:", error);
-          setIsProcessing(false);
-          setPaymentError("Payment could not be completed. Please check your Paystack configuration.");
-        },
-      });
+      window.location.href = data.authorization_url;
     } catch (err) {
-      console.error("Full booking error:", err);
-      const errorMessage = err instanceof Error ? err.message : "Could not start the booking. Please try again.";
-      setPaymentError(errorMessage);
+      console.error("Payment initialization error:", err);
+      setPaymentError(
+        err instanceof Error ? err.message : "Could not start the booking. Please try again."
+      );
       setIsProcessing(false);
     }
   };

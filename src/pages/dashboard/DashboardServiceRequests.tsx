@@ -54,6 +54,16 @@ export default function DashboardServiceRequests() {
     return list;
   }, [items, filter, search]);
 
+  async function handleContact(r: ServiceRequest) {
+    const subject = encodeURIComponent(`Following up on your ${r.services?.name ?? "Service Request"}`);
+    const body = encodeURIComponent(
+      `Hi ${r.client_name},\n\nThank you for reaching out. We've reviewed your request and would like to schedule a brief call to discuss your ${r.services?.name?.toLowerCase() ?? "project"} goals.\n\nPlease let us know your availability over the next few days.\n\nBest regards,\nBimpe\nThe Brand Strategist`
+    );
+    window.location.href = `mailto:${r.client_email}?subject=${subject}&body=${body}`;
+
+    updateStatus(r, "contacted");
+  }
+
   async function updateStatus(r: ServiceRequest, status: RequestStatus) {
     await supabase
       .from("service_requests")
@@ -66,7 +76,7 @@ export default function DashboardServiceRequests() {
     setResending(r.id);
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-confirmation-email`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-confirmation-mail`,
         {
           method: "POST",
           headers: {
@@ -375,7 +385,7 @@ export default function DashboardServiceRequests() {
                         {r.request_status !== "completed" && r.request_status !== "cancelled" && (
                           <button
                             type="button"
-                            onClick={() => updateStatus(r, "contacted")}
+                            onClick={() => handleContact(r)}
                             className="group inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-neutral-600 transition-all duration-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm"
                           >
                             <Mail className="h-3 w-3 transition-transform group-hover:scale-110" />

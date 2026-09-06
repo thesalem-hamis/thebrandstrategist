@@ -88,7 +88,7 @@ export default function ServiceRequestPage() {
 
     // Trigger the confirmation email via the edge function
     fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-confirmation-email`,
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-confirmation-mail`,
       {
         method: "POST",
         headers: {

@@ -62,7 +62,7 @@ export default function DashboardOrders() {
     setResending(o.id);
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-confirmation-email`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-confirmation-mail`,
         {
           method: "POST",
           headers: {

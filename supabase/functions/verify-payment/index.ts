@@ -202,7 +202,7 @@ Deno.serve(async (req: Request) => {
       }
 
       return new Response(
-        JSON.stringify({ success: true, type: "consultation", emailSent }),
+        JSON.stringify({ success: true, type: "consultation", emailSent, paid: true }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -230,7 +230,7 @@ Deno.serve(async (req: Request) => {
 
         // Fire the email via the centralized function
         await fetch(
-          `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-confirmation-email`,
+          `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-confirmation-mail`,
           {
             method: "POST",
             headers: {
@@ -254,7 +254,7 @@ Deno.serve(async (req: Request) => {
       }
 
       return new Response(
-        JSON.stringify({ success: true, type: "order" }),
+        JSON.stringify({ success: true, type: "order", paid: true }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
