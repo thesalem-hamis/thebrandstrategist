@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, ArrowUpRight, BookOpen, Mail } from "lucide-react";
+import { ShoppingCart, ArrowUpRight, BookOpen, Mail, User } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { BookProduct } from "@/lib/types";
 
@@ -9,9 +9,14 @@ export default function BooksPage() {
   const [products, setProducts] = useState<BookProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [purchasingId, setPurchasingId] = useState<string | null>(null);
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+
   const [showEmailPrompt, setShowEmailPrompt] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<BookProduct | null>(null);
+  const [selectedProduct, setSelectedProduct] =
+    useState<BookProduct | null>(null);
+
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
@@ -30,6 +35,7 @@ export default function BooksPage() {
     const verifyPayment = async () => {
       try {
         setLoading(true);
+        setPaymentError(null);
 
         const { data, error } =
           await supabase.functions.invoke("verify-payment", {
@@ -49,6 +55,7 @@ export default function BooksPage() {
         }
 
         setPaymentSuccess(true);
+
         window.history.replaceState(
           {},
           document.title,
@@ -56,11 +63,13 @@ export default function BooksPage() {
         );
       } catch (error) {
         console.error("Payment verification error:", error);
+
         setPaymentError(
           error instanceof Error
             ? error.message
             : "Payment verification failed"
         );
+
         window.history.replaceState(
           {},
           document.title,
@@ -76,12 +85,18 @@ export default function BooksPage() {
 
   async function loadProducts() {
     setLoading(true);
-    const { data } = await supabase
+
+    const { data, error } = await supabase
       .from("book_products")
       .select("*")
       .eq("active", true)
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Failed to load books:", error);
+    }
+
     setProducts((data ?? []) as BookProduct[]);
     setLoading(false);
   }
@@ -89,26 +104,53 @@ export default function BooksPage() {
   function initiatePurchase(product: BookProduct) {
     setSelectedProduct(product);
     setShowEmailPrompt(true);
+    setName("");
     setEmail("");
+    setPaymentError(null);
   }
 
   function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
-    proceedToPaystack(email.trim());
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      setPaymentError("Please enter your full name.");
+      return;
+    }
+
+    if (!trimmedEmail) {
+      setPaymentError("Please enter your email address.");
+      return;
+    }
+
+    proceedToPaystack(trimmedName, trimmedEmail);
   }
 
-  async function proceedToPaystack(customerEmail: string) {
+  async function proceedToPaystack(
+    customerName: string,
+    customerEmail: string
+  ) {
     if (!selectedProduct) return;
+
     setShowEmailPrompt(false);
+    setPaymentError(null);
     setPurchasingId(selectedProduct.id);
 
     try {
+      console.log("Initializing book payment:", {
+        productId: selectedProduct.id,
+        productName: selectedProduct.title,
+        clientName: customerName,
+        clientEmail: customerEmail,
+      });
+
       const { data, error } =
         await supabase.functions.invoke("initialize-payment", {
           body: {
             type: "book_order",
-            client_name: "",
+            client_name: customerName,
             client_email: customerEmail,
             client_phone: null,
             product_id: selectedProduct.id,
@@ -129,12 +171,21 @@ export default function BooksPage() {
       }
 
       if (!data?.authorization_url) {
-        throw new Error("Paystack checkout URL was not returned");
+        throw new Error(
+          "Paystack checkout URL was not returned"
+        );
       }
 
       window.location.href = data.authorization_url;
     } catch (err) {
       console.error("Purchase error:", err);
+
+      setPaymentError(
+        err instanceof Error
+          ? err.message
+          : "Unable to start payment"
+      );
+
       setPurchasingId(null);
     }
   }
@@ -142,7 +193,6 @@ export default function BooksPage() {
   return (
     <div className="w-full bg-white text-neutral-900 font-sans min-h-screen pt-20 sm:pt-28 lg:pt-36 pb-24 sm:pb-32 px-6 sm:px-12 lg:px-20">
       <div className="mx-auto max-w-7xl">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -158,34 +208,44 @@ export default function BooksPage() {
           </Link>
 
           <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-bold tracking-tight uppercase leading-none text-neutral-900">
-            THE <span className="font-serif italic text-[#5D1F17]">BOOK</span>
+            THE{" "}
+            <span className="font-serif italic text-[#5D1F17]">
+              BOOK
+            </span>
           </h1>
+
           <p className="mt-4 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-600">
-            A practical guide to building a brand that matters. From positioning to implementation.
+            A practical guide to building a brand that matters. From
+            positioning to implementation.
           </p>
-         </motion.div>
+        </motion.div>
 
-         {paymentError && (
-           <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
-             {paymentError}
-           </div>
-         )}
+        {paymentError && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+            {paymentError}
+          </div>
+        )}
 
-         {paymentSuccess && (
-           <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
-             Your purchase was verified successfully. A confirmation email has been sent.
-           </div>
-         )}
+        {paymentSuccess && (
+          <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
+            Your purchase was verified successfully. A confirmation email
+            has been sent to the email address you provided.
+          </div>
+        )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 border-t-[#5D1F17]"></div>
-            <p className="mt-4 text-xs text-neutral-500">Loading books…</p>
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 border-t-[#5D1F17]" />
+            <p className="mt-4 text-xs text-neutral-500">
+              Loading books…
+            </p>
           </div>
         ) : products.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
             <BookOpen className="h-10 w-10 text-neutral-300" />
-            <p className="mt-4 text-neutral-500">No books available yet.</p>
+            <p className="mt-4 text-neutral-500">
+              No books available yet.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -195,7 +255,6 @@ export default function BooksPage() {
                 className="lg:col-span-6 xl:col-span-6"
               >
                 <div className="group grid grid-cols-1 md:grid-cols-12 gap-8 border border-zinc-200 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
-                  {/* Cover */}
                   <div className="md:col-span-4 bg-neutral-100 flex items-center justify-center p-6">
                     {product.image_url ? (
                       <img
@@ -210,25 +269,31 @@ export default function BooksPage() {
                     )}
                   </div>
 
-                  {/* Details */}
                   <div className="md:col-span-8 p-6 sm:p-10 flex flex-col">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 font-mono mb-4">
                       Digital Book
                     </p>
+
                     <h3 className="text-lg sm:text-xl font-bold tracking-tight text-neutral-900 uppercase mb-2">
                       {product.title}
                     </h3>
+
                     {product.author && (
-                      <p className="text-xs text-neutral-500 mb-3">by {product.author}</p>
+                      <p className="text-xs text-neutral-500 mb-3">
+                        by {product.author}
+                      </p>
                     )}
+
                     <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-6 flex-1">
-                      {product.description || "A practical guide to building a brand that matters."}
+                      {product.description ||
+                        "A practical guide to building a brand that matters."}
                     </p>
 
                     <div className="flex items-center gap-4">
                       <span className="text-2xl font-bold text-[#5D1F17]">
                         ${(product.price / 100).toFixed(2)}
                       </span>
+
                       <button
                         onClick={() => initiatePurchase(product)}
                         disabled={purchasingId === product.id}
@@ -252,19 +317,40 @@ export default function BooksPage() {
         )}
       </div>
 
-      {/* Email Prompt Modal */}
       {showEmailPrompt && selectedProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-8">
             <h3 className="mb-4 text-xl font-semibold tracking-tight text-neutral-900">
-              Enter your email to complete purchase
+              Complete your purchase
             </h3>
-            <p className="mb-4 text-xs text-neutral-600">
-              We'll send your download link and receipt to this email after payment.
+
+            <p className="mb-6 text-xs text-neutral-600">
+              Enter your details below. Your receipt and book download
+              information will be sent to this email after successful
+              payment.
             </p>
-            <form onSubmit={handleEmailSubmit} className="space-y-4">
+
+            <form
+              onSubmit={handleEmailSubmit}
+              className="space-y-4"
+            >
+              <div className="relative">
+                <User className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  placeholder="Your full name"
+                  className="w-full rounded-xl border border-neutral-200 pl-11 pr-4 py-3 text-xs outline-none focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+                  autoComplete="name"
+                />
+              </div>
+
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+
                 <input
                   type="email"
                   value={email}
@@ -275,14 +361,19 @@ export default function BooksPage() {
                   autoComplete="email"
                 />
               </div>
+
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowEmailPrompt(false)}
+                  onClick={() => {
+                    setShowEmailPrompt(false);
+                    setPaymentError(null);
+                  }}
                   className="flex-1 rounded-full border border-neutral-200 px-5 py-3 text-xs font-semibold text-neutral-600 hover:border-neutral-400"
                 >
                   Cancel
                 </button>
+
                 <button
                   type="submit"
                   className="flex-1 rounded-full bg-[#5D1F17] px-5 py-3 text-xs font-semibold text-white hover:bg-[#4A1812]"

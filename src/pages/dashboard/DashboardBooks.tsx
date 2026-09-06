@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+
 import {
   Plus,
   Pencil,
@@ -8,6 +9,7 @@ import {
   CheckCircle2,
   BookOpen,
 } from "lucide-react";
+
 import { supabase } from "@/lib/supabase";
 import type { BookProduct } from "@/lib/types";
 
@@ -63,7 +65,9 @@ export default function DashboardBooks() {
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       setProducts((data ?? []) as BookProduct[]);
     } catch (err) {
@@ -89,6 +93,7 @@ export default function DashboardBooks() {
 
     if (error) {
       console.error("Session check failed:", error);
+
       throw new Error(
         "Unable to verify your admin session. Please refresh the page and try again."
       );
@@ -96,7 +101,7 @@ export default function DashboardBooks() {
 
     if (!session?.user) {
       throw new Error(
-        "You must be logged into the admin dashboard before uploading files."
+        "You must be logged into the admin dashboard before performing this action."
       );
     }
 
@@ -149,13 +154,16 @@ export default function DashboardBooks() {
     try {
       const url = new URL(urlString);
 
-      const marker = `/storage/v1/object/public/${bucket}/`;
+      const publicMarker = `/storage/v1/object/public/${bucket}/`;
 
-      if (url.pathname.includes(marker)) {
-        return decodeURIComponent(url.pathname.split(marker)[1]);
+      if (url.pathname.includes(publicMarker)) {
+        return decodeURIComponent(
+          url.pathname.split(publicMarker)[1]
+        );
       }
 
-      const authenticatedMarker = `/storage/v1/object/authenticated/${bucket}/`;
+      const authenticatedMarker =
+        `/storage/v1/object/authenticated/${bucket}/`;
 
       if (url.pathname.includes(authenticatedMarker)) {
         return decodeURIComponent(
@@ -166,22 +174,30 @@ export default function DashboardBooks() {
       const objectMarker = `/storage/v1/object/${bucket}/`;
 
       if (url.pathname.includes(objectMarker)) {
-        return decodeURIComponent(url.pathname.split(objectMarker)[1]);
+        return decodeURIComponent(
+          url.pathname.split(objectMarker)[1]
+        );
       }
 
-      const bucketIndex = url.pathname.split("/").findIndex(
+      const parts = url.pathname.split("/");
+
+      const bucketIndex = parts.findIndex(
         (part) => part === bucket
       );
 
       if (bucketIndex !== -1) {
         return decodeURIComponent(
-          url.pathname.split("/").slice(bucketIndex + 1).join("/")
+          parts.slice(bucketIndex + 1).join("/")
         );
       }
 
       return null;
     } catch (error) {
-      console.warn("Could not parse storage URL:", error);
+      console.warn(
+        "Could not parse storage URL:",
+        error
+      );
+
       return null;
     }
   }
@@ -194,11 +210,15 @@ export default function DashboardBooks() {
     url: string | null | undefined,
     bucket: UploadBucket
   ) {
-    if (!url) return;
+    if (!url) {
+      return;
+    }
 
     const path = getStoragePathFromUrl(url, bucket);
 
-    if (!path) return;
+    if (!path) {
+      return;
+    }
 
     const { error } = await supabase.storage
       .from(bucket)
@@ -223,19 +243,24 @@ export default function DashboardBooks() {
   ) {
     const file = e.target.files?.[0];
 
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
-    // Reset input so the same file can be selected again later.
+    // Reset input so same file can be selected again.
     e.target.value = "";
 
     // ----------------------------------------------------------
-    // CHECK AUTHENTICATION FIRST
+    // CHECK AUTHENTICATION
     // ----------------------------------------------------------
 
     try {
       await requireAuthenticatedAdmin();
     } catch (err) {
-      console.error("Authentication required:", err);
+      console.error(
+        "Authentication required:",
+        err
+      );
 
       const message =
         err instanceof Error
@@ -266,7 +291,8 @@ export default function DashboardBooks() {
       if (!validTypes.includes(file.type.toLowerCase())) {
         setUploadMessage({
           tone: "err",
-          text: "Please select a valid image file (PNG, JPG, GIF, or WebP).",
+          text:
+            "Please select a valid image file (PNG, JPG, GIF, or WebP).",
         });
 
         return;
@@ -287,9 +313,10 @@ export default function DashboardBooks() {
     // ----------------------------------------------------------
 
     if (field === "pdf_url") {
-      const validTypes = ["application/pdf"];
-
-      if (!validTypes.includes(file.type.toLowerCase())) {
+      if (
+        file.type.toLowerCase() !==
+        "application/pdf"
+      ) {
         setUploadMessage({
           tone: "err",
           text: "Please select a valid PDF file.",
@@ -335,25 +362,23 @@ export default function DashboardBooks() {
         .toString(36)
         .substring(2, 10)}`;
 
-      const fileName = `${safeBaseName || "file"}-${uniqueName}.${fileExt}`;
+      const fileName = `${
+        safeBaseName || "file"
+      }-${uniqueName}.${fileExt}`;
 
-      // IMPORTANT:
-      // Do NOT put the bucket name into the storage path.
-      //
-      // Correct:
-      //   filename.pdf
-      //
-      // NOT:
-      //   book-files/filename.pdf
-      //
+      // Do NOT include bucket name in path.
       const filePath = fileName;
 
       // --------------------------------------------------------
       // UPLOAD
       // --------------------------------------------------------
 
-      const { data: uploadData, error: uploadError } =
-        await supabase.storage.from(bucket).upload(filePath, file, {
+      const {
+        data: uploadData,
+        error: uploadError,
+      } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, {
           cacheControl: "3600",
           upsert: false,
           contentType: file.type,
@@ -400,20 +425,6 @@ export default function DashboardBooks() {
       // --------------------------------------------------------
       // PDF = PRIVATE STORAGE PATH
       // --------------------------------------------------------
-      //
-      // book-files is PRIVATE.
-      //
-      // Therefore we intentionally DO NOT use getPublicUrl()
-      // for PDFs.
-      //
-      // We store the private storage path instead.
-      //
-      // Example:
-      //   1788638713067-gf05gs.pdf
-      //
-      // Your payment/download backend can later use this path
-      // to create a signed URL.
-      // --------------------------------------------------------
 
       if (bucket === "book-files") {
         setForm((prev) => ({
@@ -429,16 +440,17 @@ export default function DashboardBooks() {
     } catch (err) {
       console.error("Upload failed:", err);
 
-      let errorMessage = "Upload failed. Please try again.";
+      let errorMessage =
+        "Upload failed. Please try again.";
 
       if (err instanceof Error) {
         errorMessage = err.message;
       }
 
-      // Make the most common RLS error easier to understand.
       if (
-        errorMessage.toLowerCase().includes("row-level security") ||
-        errorMessage.toLowerCase().includes("violates row-level security")
+        errorMessage
+          .toLowerCase()
+          .includes("row-level security")
       ) {
         errorMessage =
           "Upload blocked by Supabase security. Make sure you are logged into the admin dashboard.";
@@ -465,10 +477,6 @@ export default function DashboardBooks() {
     setSaveError(null);
 
     try {
-      // --------------------------------------------------------
-      // CHECK ADMIN SESSION
-      // --------------------------------------------------------
-
       await requireAuthenticatedAdmin();
 
       // --------------------------------------------------------
@@ -483,10 +491,18 @@ export default function DashboardBooks() {
       // VALIDATE PRICE
       // --------------------------------------------------------
 
-      const priceCents = parseInt(form.price, 10);
+      const priceCents = parseInt(
+        form.price,
+        10
+      );
 
-      if (isNaN(priceCents) || priceCents < 1) {
-        throw new Error("Price must be at least 1 cent.");
+      if (
+        isNaN(priceCents) ||
+        priceCents < 1
+      ) {
+        throw new Error(
+          "Price must be at least 1 cent."
+        );
       }
 
       // --------------------------------------------------------
@@ -496,9 +512,15 @@ export default function DashboardBooks() {
       let stockQty: number | null = null;
 
       if (form.stock_qty.trim()) {
-        const parsedStock = parseInt(form.stock_qty, 10);
+        const parsedStock = parseInt(
+          form.stock_qty,
+          10
+        );
 
-        if (isNaN(parsedStock) || parsedStock < 0) {
+        if (
+          isNaN(parsedStock) ||
+          parsedStock < 0
+        ) {
           throw new Error(
             "Stock quantity must be a valid number greater than or equal to 0."
           );
@@ -514,16 +536,12 @@ export default function DashboardBooks() {
       const payload = {
         title: form.title.trim(),
         author: form.author?.trim() || null,
-        description: form.description?.trim() || null,
+        description:
+          form.description?.trim() || null,
         price: priceCents,
         sku: form.sku?.trim() || null,
         image_url: form.image_url || null,
-
-        // IMPORTANT:
-        // For book-files this is the PRIVATE STORAGE PATH,
-        // not a public URL.
         pdf_url: form.pdf_url || null,
-
         stock_qty: stockQty,
         is_digital: form.is_digital,
         active: form.active,
@@ -573,7 +591,9 @@ export default function DashboardBooks() {
           ? err.message
           : String(err);
 
-      setSaveError(`Failed to save book: ${message}`);
+      setSaveError(
+        `Failed to save book: ${message}`
+      );
     } finally {
       setSaving(false);
     }
@@ -586,7 +606,7 @@ export default function DashboardBooks() {
   async function remove(id: string) {
     if (
       !confirm(
-        "Delete this book product permanently? This will also remove its uploaded cover and PDF."
+        "Delete this book product permanently? This will also remove its related orders, uploaded cover and PDF."
       )
     ) {
       return;
@@ -601,14 +621,43 @@ export default function DashboardBooks() {
 
       await requireAuthenticatedAdmin();
 
-      const product = products.find((p) => p.id === id);
+      const product = products.find(
+        (p) => p.id === id
+      );
 
       if (!product) {
-        throw new Error("Book product not found.");
+        throw new Error(
+          "Book product not found."
+        );
       }
 
       // --------------------------------------------------------
-      // REMOVE COVER
+      // DELETE RELATED ORDERS FIRST
+      // --------------------------------------------------------
+      //
+      // orders.product_id references
+      // book_products.id.
+      //
+      // PostgreSQL will reject deletion of the
+      // book_products row while an order still
+      // references it.
+      //
+
+      const {
+        error: ordersDeleteError,
+      } = await supabase
+        .from("orders")
+        .delete()
+        .eq("product_id", id);
+
+      if (ordersDeleteError) {
+        throw new Error(
+          `Failed to remove related orders: ${ordersDeleteError.message}`
+        );
+      }
+
+      // --------------------------------------------------------
+      // REMOVE COVER FROM STORAGE
       // --------------------------------------------------------
 
       if (product.image_url) {
@@ -619,28 +668,22 @@ export default function DashboardBooks() {
       }
 
       // --------------------------------------------------------
-      // REMOVE PDF
-      // --------------------------------------------------------
-      //
-      // pdf_url may now be a private storage path.
-      //
-      // We support both:
-      //   1. New private path format
-      //   2. Old full URL format
+      // REMOVE PDF FROM STORAGE
       // --------------------------------------------------------
 
       if (product.pdf_url) {
         let pdfPath = product.pdf_url;
 
-        // If it's a full URL, extract the storage path.
+        // Support old full URL format.
         if (
           pdfPath.startsWith("http://") ||
           pdfPath.startsWith("https://")
         ) {
-          const extractedPath = getStoragePathFromUrl(
-            pdfPath,
-            "book-files"
-          );
+          const extractedPath =
+            getStoragePathFromUrl(
+              pdfPath,
+              "book-files"
+            );
 
           if (extractedPath) {
             pdfPath = extractedPath;
@@ -648,10 +691,11 @@ export default function DashboardBooks() {
         }
 
         if (pdfPath) {
-          const { error: pdfDeleteError } =
-            await supabase.storage
-              .from("book-files")
-              .remove([pdfPath]);
+          const {
+            error: pdfDeleteError,
+          } = await supabase.storage
+            .from("book-files")
+            .remove([pdfPath]);
 
           if (pdfDeleteError) {
             console.warn(
@@ -663,28 +707,39 @@ export default function DashboardBooks() {
       }
 
       // --------------------------------------------------------
-      // DELETE DATABASE RECORD
+      // DELETE BOOK PRODUCT
       // --------------------------------------------------------
 
-      const { error } = await supabase
+      const {
+        error: productDeleteError,
+      } = await supabase
         .from("book_products")
         .delete()
         .eq("id", id);
 
-      if (error) {
-        throw error;
+      if (productDeleteError) {
+        throw productDeleteError;
       }
+
+      // --------------------------------------------------------
+      // REFRESH
+      // --------------------------------------------------------
 
       await load();
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error(
+        "Delete error:",
+        err
+      );
 
       const message =
         err instanceof Error
           ? err.message
           : String(err);
 
-      alert(`Failed to delete book product.\n\n${message}`);
+      alert(
+        `Failed to delete book product.\n\n${message}`
+      );
     } finally {
       setDeleting(null);
     }
@@ -701,6 +756,7 @@ export default function DashboardBooks() {
   return (
     <div className="space-y-8">
       {/* Header */}
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-neutral-400">
@@ -712,8 +768,8 @@ export default function DashboardBooks() {
           </h1>
 
           <p className="mt-1 text-sm text-neutral-500">
-            Manage book listings, upload covers and PDFs, set
-            prices and inventory.
+            Manage book listings, upload covers and
+            PDFs, set prices and inventory.
           </p>
         </div>
 
@@ -728,6 +784,7 @@ export default function DashboardBooks() {
       </div>
 
       {/* Stats */}
+
       <div className="grid grid-cols-2 gap-4 xl:grid-cols-3">
         <div className="rounded-2xl border border-neutral-200/70 bg-white p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">
@@ -760,7 +817,8 @@ export default function DashboardBooks() {
         </div>
       </div>
 
-      {/* Upload message */}
+      {/* Upload Message */}
+
       {uploadMessage && (
         <div
           className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-medium ${
@@ -779,7 +837,8 @@ export default function DashboardBooks() {
         </div>
       )}
 
-      {/* Save error */}
+      {/* Save Error */}
+
       {saveError && (
         <div className="flex items-center gap-2 rounded-xl border border-red-200/60 bg-red-50 px-4 py-3 text-xs font-medium text-red-700">
           <X className="h-3.5 w-3.5" />
@@ -788,6 +847,7 @@ export default function DashboardBooks() {
       )}
 
       {/* Table */}
+
       <div className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px] text-left">
@@ -856,8 +916,8 @@ export default function DashboardBooks() {
                         </p>
 
                         <p className="mt-1 text-[11px] text-neutral-500">
-                          Add your first book product to start
-                          selling.
+                          Add your first book product
+                          to start selling.
                         </p>
                       </div>
                     </div>
@@ -982,6 +1042,7 @@ export default function DashboardBooks() {
       </div>
 
       {/* Editor */}
+
       {showEditor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
           <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-8">
@@ -1010,6 +1071,7 @@ export default function DashboardBooks() {
               className="mt-6 space-y-6"
             >
               {/* Title + Author */}
+
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-neutral-400">
@@ -1052,6 +1114,7 @@ export default function DashboardBooks() {
               </div>
 
               {/* Description */}
+
               <div>
                 <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-neutral-400">
                   Description
@@ -1072,6 +1135,7 @@ export default function DashboardBooks() {
               </div>
 
               {/* Price / SKU / Stock */}
+
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
                 <div>
                   <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-neutral-400">
@@ -1135,8 +1199,10 @@ export default function DashboardBooks() {
               </div>
 
               {/* Cover + PDF */}
+
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {/* Cover */}
+
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-neutral-400">
@@ -1149,7 +1215,8 @@ export default function DashboardBooks() {
                       onChange={(e) =>
                         setForm({
                           ...form,
-                          image_url: e.target.value,
+                          image_url:
+                            e.target.value,
                         })
                       }
                       placeholder="Or paste image URL"
@@ -1197,6 +1264,7 @@ export default function DashboardBooks() {
                 </div>
 
                 {/* PDF */}
+
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-widest text-neutral-400">
@@ -1209,7 +1277,8 @@ export default function DashboardBooks() {
                       onChange={(e) =>
                         setForm({
                           ...form,
-                          pdf_url: e.target.value,
+                          pdf_url:
+                            e.target.value,
                         })
                       }
                       placeholder="Private PDF storage path"
@@ -1258,6 +1327,7 @@ export default function DashboardBooks() {
               </div>
 
               {/* Digital */}
+
               <div className="flex items-center justify-between rounded-xl border border-neutral-200 p-4">
                 <div>
                   <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-neutral-400">
@@ -1265,7 +1335,8 @@ export default function DashboardBooks() {
                   </label>
 
                   <p className="text-[11px] text-neutral-500">
-                    Enable to provide instant digital download
+                    Enable to provide instant digital
+                    download
                   </p>
                 </div>
 
@@ -1302,6 +1373,7 @@ export default function DashboardBooks() {
               </div>
 
               {/* Actions */}
+
               <div className="flex items-center justify-end gap-3 pt-2">
                 <button
                   type="button"
@@ -1331,7 +1403,10 @@ export default function DashboardBooks() {
                   )}
 
                   <span>
-                    {form.id ? "Update" : "Create"} Book
+                    {form.id
+                      ? "Update"
+                      : "Create"}{" "}
+                    Book
                   </span>
                 </button>
               </div>
@@ -1342,4 +1417,3 @@ export default function DashboardBooks() {
     </div>
   );
 }
-
