@@ -74,7 +74,8 @@ create table if not exists public.book_products (
   is_digital  boolean not null default false,
   active      boolean not null default true,
   sort_order  integer not null default 0,
-  created_at  timestamptz not null default now()
+  created_at  timestamptz not null default now(),
+  selar_link  text
 );
 
 -- ------------------------------------------------------------
@@ -369,11 +370,13 @@ create index if not exists idx_email_log_reference on public.email_log (referenc
 -- ============================================================
 -- Default book product
 -- ============================================================
-insert into public.book_products (sku, title, author, description, price, currency, is_digital, active, sort_order) values
+insert into public.book_products (sku, title, author, description, price, currency, is_digital, active, sort_order, selar_link) values
   ('brand-strategist-book', 'The Brand Strategist', 'Bimpe Mohammed',
    'A practical guide to building a brand that matters — covering positioning, messaging, visual identity, and growth strategy.',
-   3500, 'USD', true, true, 1)
+   3500, 'USD', true, true, 1, null)
 on conflict (sku) do update set
   title = excluded.title,
   description = excluded.description,
-  price = excluded.price;
+  price = excluded.price,
+  currency = excluded.currency,
+  selar_link = excluded.selar_link;

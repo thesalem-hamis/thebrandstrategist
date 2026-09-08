@@ -210,58 +210,6 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    // 3. Handle Book order payment
-    const { data: order } = await supabase
-      .from("orders")
-      .select("*, book_products!inner(title)")
-      .eq("paystack_reference", reference)
-      .maybeSingle();
-
-    if (order) {
-      if (order.order_status !== "paid") {
-        await supabase
-          .from("orders")
-          .update({
-            order_status: "paid",
-            payment_status: "paid",
-            paid_at: new Date().toISOString(),
-          })
-          .eq("id", order.id);
-
-        // Fire the email via the centralized function
-        await fetch(
-          `${Deno.env.get("SUPABASE_URL")}/functions/v1/send-confirmation-mail`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-            },
-            body: JSON.stringify({
-              template: "order",
-              data: {
-                client_name: order.client_name,
-                client_email: order.client_email,
-                book_title: order.book_products?.title,
-                quantity: order.quantity,
-                total_amount: order.total_amount,
-                currency: order.currency,
-                order_number: order.order_number,
-              },
-            }),
-          }
-        ).catch((e) => console.error("Order email dispatch failed:", e));
-      }
-
-      return new Response(
-        JSON.stringify({ success: true, type: "order", paid: true }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-
     return new Response(
       JSON.stringify({ success: false, message: "No matching record for this reference" }),
       {

@@ -25,17 +25,13 @@ const corsHeaders = {
 };
 
 interface InitBody {
-  type: "consultation" | "book_order";
+  type: "consultation";
   client_name: string;
   client_email: string;
   client_phone?: string;
   notes?: string;
   session_date?: string;
   session_time?: string;
-  product_id?: string;
-  quantity?: number;
-  order_number?: string;
-  paystack_reference?: string;
 }
 
 Deno.serve(async (req: Request) => {
@@ -131,57 +127,6 @@ Deno.serve(async (req: Request) => {
         },
       };
     } else {
-      // book_order
-      const { data: order, error: insertError } = await supabase
-        .from("orders")
-        .insert({
-          order_number: body.order_number ?? `ORDER-${reference.slice(-8)}`,
-          product_id: body.product_id,
-          quantity: body.quantity ?? 1,
-          total_amount: 0,
-          currency: "USD",
-          client_name: body.client_name,
-          client_email: body.client_email,
-          client_phone: body.client_phone ?? null,
-          delivery_info: null,
-          payment_status: "pending",
-          order_status: "pending",
-          paystack_reference: reference,
-          email_sent: false,
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      const { data: product } = await supabase
-        .from("book_products")
-        .select("title, price, currency")
-        .eq("id", body.product_id!)
-        .maybeSingle();
-
-      const amountCents = product?.price ?? 0;
-      const currency = product?.currency ?? "USD";
-
-      await supabase
-        .from("orders")
-        .update({ total_amount: amountCents, currency })
-        .eq("id", order.id);
-
-      paystackBody = {
-        email: body.client_email,
-        amount: amountCents,
-        currency,
-        reference,
-        callback_url: `${callbackUrl}&reference=${reference}`,
-        metadata: {
-          order_id: order.id,
-          product_title: product?.title,
-          product_sku: null,
-          client_name: body.client_name,
-        },
-      };
-    }
 
     // Call Paystack to initialize the transaction
     const paystackRes = await fetch(

@@ -222,6 +222,7 @@ export interface PricingTier {
   description: string;
   features: string[];
   highlighted: boolean;
+  paymentRequired?: boolean;
   ctaText: string;
   ctaLink: string;
 }
@@ -241,6 +242,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Action plan & next steps",
     ],
     highlighted: false,
+    paymentRequired: true,
     ctaText: "Book Session",
     ctaLink: "/book-a-session",
   },
@@ -257,6 +259,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Implementation assets",
     ],
     highlighted: true,
+    paymentRequired: false,
     ctaText: "Request a Call",
     ctaLink: "/services/brand-identity",
   },
@@ -273,6 +276,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Priority support",
     ],
     highlighted: false,
+    paymentRequired: false,
     ctaText: "Request a Call",
     ctaLink: "/services/strategy-1500",
   },

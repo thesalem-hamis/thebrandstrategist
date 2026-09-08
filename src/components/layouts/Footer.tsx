@@ -1,6 +1,7 @@
 import {
-  FaXTwitter,
-  FaFacebookF,
+  FaLinkedinIn,
+  FaWhatsapp,
+  FaBehance,
   FaInstagram,
 } from "react-icons/fa6";
 
@@ -23,9 +24,26 @@ const COMPANY_LINKS = [
 // ];
 
 const SOCIAL_LINKS = [
-  { icon: FaXTwitter, href: "#", label: "X" },
-  { icon: FaFacebookF, href: "#", label: "Facebook" },
-  { icon: FaInstagram, href: "#", label: "Instagram" },
+  {
+    icon: FaLinkedinIn,
+    href: "https://www.linkedin.com/in/adebimpe-mohammed-a60087150?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
+    label: "LinkedIn",
+  },
+  {
+    icon: FaWhatsapp,
+    href: "https://wa.link/bn9g2h",
+    label: "WhatsApp",
+  },
+  {
+    icon: FaInstagram,
+    href: "https://www.instagram.com/itsbnm",
+    label: "Instagram",
+  },
+  {
+    icon: FaBehance,
+    href: "https://www.behance.net/adebimpmohamme",
+    label: "Behance",
+  },
 ];
 
 const BURGUNDY = "#6B1F3A";
