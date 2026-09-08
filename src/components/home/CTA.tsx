@@ -51,7 +51,7 @@ export function CTA() {
           {/* CTA Button */}
           <div className="mt-7 sm:mt-8 flex justify-center">
             <motion.a
-              href="#booking"
+              href="/book-a-session"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}

@@ -26,20 +26,6 @@ const pricingPlans: PricingPlan[] = [
     buttonLink: "/book-a-session",
   },
   {
-    price: "$2,000",
-    title: "Personal Brand Strategy",
-    description: "Build a brand people remember and trust",
-    features: [
-      "Personal Brand Positioning",
-      "Audience Definition",
-      "Visibility Roadmap",
-      "90-Day Brand Action Plan",
-    ],
-    highlighted: false,
-    buttonText: "Get Started",
-    buttonLink: "#contact",
-  },
-  {
     price: "$1,500",
     title: "Brand Identity Systems",
     description: "Bring your business and brand strategy to life",
@@ -51,7 +37,21 @@ const pricingPlans: PricingPlan[] = [
     ],
     highlighted: false,
     buttonText: "Get Started",
-    buttonLink: "#contact",
+    buttonLink: "/services",
+  },
+  {
+    price: "$2,000",
+    title: "Personal Brand Strategy",
+    description: "Build a brand people remember and trust",
+    features: [
+      "Personal Brand Positioning",
+      "Audience Definition",
+      "Visibility Roadmap",
+      "90-Day Brand Action Plan",
+    ],
+    highlighted: false,
+    buttonText: "Get Started",
+    buttonLink: "/services",
   },
 ];
 

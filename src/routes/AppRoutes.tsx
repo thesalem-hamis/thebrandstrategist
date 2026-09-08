@@ -5,7 +5,7 @@ import HomePage from "@/pages/HomePage";
 import AboutPage from "@/pages/AboutPage";
 import ProjectsPage from "@/pages/ProjectsPage";
 import ProjectDetailPage from "@/pages/ProjectsDetailsPage";
-import ContactPage from "@/pages/ContactPage";
+// import ContactPage from "@/pages/ContactPage";
 import ServicesPage from "@/pages/ServicesPage";
 import ServiceRequestPage from "@/pages/ServiceRequestPage";
 import ConsultationPage from "@/pages/ConsultationPage";
@@ -90,7 +90,7 @@ export default function AppRoutes() {
         <Route path="about" element={<AboutPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:slug" element={<ProjectDetailPage />} />
-        <Route path="contact" element={<ContactPage />} />
+        {/* <Route path="contact" element={<ContactPage />} /> */}
          <Route path="book-a-session" element={<ConsultationPage />} />
          <Route path="services" element={<ServicesPage />} />
          <Route path="services/:id" element={<ServiceRequestPage />} />

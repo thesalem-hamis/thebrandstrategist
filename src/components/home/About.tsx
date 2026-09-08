@@ -336,7 +336,7 @@ export const About: React.FC = () => {
 
           {/* CTA Link Button */}
           <motion.a
-            href="#contact"
+            href="/about"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="group inline-flex items-center gap-2 w-fit text-[#5D1F17] hover:text-[#4A1812] font-bold text-xs uppercase tracking-wider transition-all duration-300"
