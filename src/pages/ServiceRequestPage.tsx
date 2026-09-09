@@ -493,8 +493,7 @@ export default function ServiceRequestPage() {
               </p>
 
               <p className="mt-2 max-w-md text-xs text-neutral-500 leading-relaxed">
-                You'll hear back with tailored next steps within two
-                business days.
+                You'll hear back with tailored next steps within 24Hrs.
               </p>
 
               <div className="mt-8 flex gap-3">
