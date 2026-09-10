@@ -1,17 +1,86 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowUpRight, BookOpen, ShoppingCart } from "lucide-react";
+import { ShoppingCart, ArrowUpRight, BookOpen, Mail, User } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { BookProduct } from "@/lib/types";
 
 export default function BooksPage() {
   const [products, setProducts] = useState<BookProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  const [purchasingId, setPurchasingId] = useState<string | null>(null);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [showEmailPrompt, setShowEmailPrompt] = useState(false);
+  const [selectedProduct, setSelectedProduct] =
+    useState<BookProduct | null>(null);
+
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     loadProducts();
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get("payment");
+    const reference = params.get("reference");
+
+    if (payment !== "callback" || !reference) return;
+
+    const verifyPayment = async () => {
+      try {
+        setLoading(true);
+        setPaymentError(null);
+
+        const { data, error } =
+          await supabase.functions.invoke("verify-payment", {
+            body: { reference },
+          });
+
+        if (error) {
+          throw new Error(
+            error.message || "Payment verification failed"
+          );
+        }
+
+        if (!data?.success || !data?.paid) {
+          throw new Error(
+            data?.message || "Payment could not be verified"
+          );
+        }
+
+        setPaymentSuccess(true);
+
+        window.history.replaceState(
+          {},
+          document.title,
+          "/book"
+        );
+      } catch (error) {
+        console.error("Payment verification error:", error);
+
+        setPaymentError(
+          error instanceof Error
+            ? error.message
+            : "Payment verification failed"
+        );
+
+        window.history.replaceState(
+          {},
+          document.title,
+          "/book"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyPayment();
   }, []);
 
   async function loadProducts() {
@@ -30,6 +99,95 @@ export default function BooksPage() {
 
     setProducts((data ?? []) as BookProduct[]);
     setLoading(false);
+  }
+
+  function initiatePurchase(product: BookProduct) {
+    setSelectedProduct(product);
+    setShowEmailPrompt(true);
+    setName("");
+    setEmail("");
+    setPaymentError(null);
+  }
+
+  function handleEmailSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      setPaymentError("Please enter your full name.");
+      return;
+    }
+
+    if (!trimmedEmail) {
+      setPaymentError("Please enter your email address.");
+      return;
+    }
+
+    proceedToPaystack(trimmedName, trimmedEmail);
+  }
+
+  async function proceedToPaystack(
+    customerName: string,
+    customerEmail: string
+  ) {
+    if (!selectedProduct) return;
+
+    setShowEmailPrompt(false);
+    setPaymentError(null);
+    setPurchasingId(selectedProduct.id);
+
+    try {
+      console.log("Initializing book payment:", {
+        productId: selectedProduct.id,
+        productName: selectedProduct.title,
+        clientName: customerName,
+        clientEmail: customerEmail,
+      });
+
+      const { data, error } =
+        await supabase.functions.invoke("initialize-payment", {
+          body: {
+            type: "book_order",
+            client_name: customerName,
+            client_email: customerEmail,
+            client_phone: null,
+            product_id: selectedProduct.id,
+            quantity: 1,
+          },
+        });
+
+      if (error) {
+        throw new Error(
+          error.message || "Unable to initialize payment"
+        );
+      }
+
+      if (!data?.success) {
+        throw new Error(
+          data?.message || "Unable to initialize payment"
+        );
+      }
+
+      if (!data?.authorization_url) {
+        throw new Error(
+          "Paystack checkout URL was not returned"
+        );
+      }
+
+      window.location.href = data.authorization_url;
+    } catch (err) {
+      console.error("Purchase error:", err);
+
+      setPaymentError(
+        err instanceof Error
+          ? err.message
+          : "Unable to start payment"
+      );
+
+      setPurchasingId(null);
+    }
   }
 
   return (
@@ -52,7 +210,7 @@ export default function BooksPage() {
           <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-bold tracking-tight uppercase leading-none text-neutral-900">
             THE{" "}
             <span className="font-serif italic text-[#5D1F17]">
-              BOOK
+              COLLECTION
             </span>
           </h1>
 
@@ -61,6 +219,19 @@ export default function BooksPage() {
             positioning to implementation.
           </p>
         </motion.div>
+
+        {paymentError && (
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+            {paymentError}
+          </div>
+        )}
+
+        {paymentSuccess && (
+          <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs text-emerald-700">
+            Your purchase was verified successfully. A confirmation email
+            has been sent to the email address you provided.
+          </div>
+        )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -78,13 +249,9 @@ export default function BooksPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            {products.map((product, index) => (
-              <motion.div
+            {products.map((product) => (
+              <div
                 key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="lg:col-span-6 xl:col-span-6"
               >
                 <div className="group grid grid-cols-1 md:grid-cols-12 gap-8 border border-zinc-200 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
@@ -127,30 +294,97 @@ export default function BooksPage() {
                         ${(product.price / 100).toFixed(2)}
                       </span>
 
-                      {product.selar_link ? (
-                        <a
-                          href={product.selar_link}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="ml-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#5D1F17] px-6 py-3 text-xs font-semibold text-white hover:bg-[#4A1812] shadow transition-colors"
-                        >
-                          <ShoppingCart className="h-3.5 w-3.5" />
-                          <span>Buy on Selar</span>
-                          <ArrowUpRight className="h-3.5 w-3.5" />
-                        </a>
-                      ) : (
-                        <span className="ml-auto text-[11px] font-medium text-neutral-400">
-                          Unavailable
-                        </span>
-                      )}
+                      <button
+                        onClick={() => initiatePurchase(product)}
+                        disabled={purchasingId === product.id}
+                        className="ml-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#5D1F17] px-6 py-3 text-xs font-semibold text-white hover:bg-[#4A1812] shadow transition-colors disabled:opacity-50"
+                      >
+                        {purchasingId === product.id ? (
+                          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        ) : (
+                          <>
+                            <ShoppingCart className="h-3.5 w-3.5" />
+                            <span>Buy Now</span>
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
       </div>
+
+      {showEmailPrompt && selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-8">
+            <h3 className="mb-4 text-xl font-semibold tracking-tight text-neutral-900">
+              Complete your purchase
+            </h3>
+
+            <p className="mb-6 text-xs text-neutral-600">
+              Enter your details below. Your receipt and book download
+              information will be sent to this email after successful
+              payment.
+            </p>
+
+            <form
+              onSubmit={handleEmailSubmit}
+              className="space-y-4"
+            >
+              <div className="relative">
+                <User className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  placeholder="Your full name"
+                  className="w-full rounded-xl border border-neutral-200 pl-11 pr-4 py-3 text-xs outline-none focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+                  autoComplete="name"
+                />
+              </div>
+
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-400" />
+
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="you@company.com"
+                  className="w-full rounded-xl border border-neutral-200 pl-11 pr-4 py-3 text-xs outline-none focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+                  autoComplete="email"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEmailPrompt(false);
+                    setPaymentError(null);
+                  }}
+                  className="flex-1 rounded-full border border-neutral-200 px-5 py-3 text-xs font-semibold text-neutral-600 hover:border-neutral-400"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="flex-1 rounded-full bg-[#5D1F17] px-5 py-3 text-xs font-semibold text-white hover:bg-[#4A1812]"
+                >
+                  Continue to Pay
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

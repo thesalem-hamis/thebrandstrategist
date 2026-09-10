@@ -11,6 +11,7 @@ import {
   Sparkles,
   ChevronRight,
   Mail,
+  Trash2,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { Order } from "@/lib/types";
@@ -24,6 +25,9 @@ export default function DashboardOrders() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<StatusFilter>("all");
   const [resending, setResending] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; orderNumber: string; clientName: string } | null>(null);
   const [message, setMessage] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
 
   async function load() {
@@ -39,6 +43,43 @@ export default function DashboardOrders() {
 
   useEffect(() => {
     load();
+
+    const channel = supabase
+      .channel("orders-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "orders",
+        },
+        async (payload) => {
+          console.log("Order realtime event:", payload);
+
+          if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
+            await load();
+          }
+
+          if (payload.eventType === "DELETE") {
+            const deletedId = String(
+              (payload.old as { id?: string })?.id ?? ""
+            );
+
+            if (deletedId) {
+              setItems((current) =>
+                current.filter((item) => item.id !== deletedId)
+              );
+            }
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log("Orders realtime status:", status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const filtered = useMemo(() => {
@@ -99,6 +140,62 @@ export default function DashboardOrders() {
       setMessage({ tone: "err", text: `Error: ${String(err)}` });
     } finally {
       setResending(null);
+    }
+  }
+
+  function requestDelete(o: Order) {
+    setDeleteTarget({
+      id: o.id,
+      orderNumber: o.order_number,
+      clientName: o.client_name,
+    });
+    setShowDeleteModal(true);
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+
+    setShowDeleteModal(false);
+    setDeleting(deleteTarget.id);
+
+    try {
+      const { error } = await supabase
+        .from("orders")
+        .delete()
+        .eq("id", deleteTarget.id);
+
+      if (error) {
+        throw error;
+      }
+
+      setMessage({
+        tone: "ok",
+        text: `Order #${deleteTarget.orderNumber} deleted successfully.`,
+      });
+
+      setTimeout(() => setMessage(null), 3000);
+    } catch (err) {
+      console.error("Delete order error:", err);
+
+      const rawMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to delete order";
+
+      const sanitized = rawMessage
+        .replace(/localhost:\d+/g, "this site")
+        .replace(/http:\/\/localhost[^\s]*/g, "this site")
+        .replace(/https:\/\/localhost[^\s]*/g, "this site");
+
+      setMessage({
+        tone: "err",
+        text: sanitized,
+      });
+
+      setTimeout(() => setMessage(null), 5000);
+    } finally {
+      setDeleting(null);
+      setDeleteTarget(null);
     }
   }
 
@@ -387,21 +484,37 @@ export default function DashboardOrders() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {o.payment_status === "paid" && (
+                      <div className="flex items-center justify-end gap-2">
+                        {o.payment_status === "paid" && (
+                          <button
+                            type="button"
+                            onClick={() => resendOrderEmail(o)}
+                            disabled={resending === o.id}
+                            className="group inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-neutral-600 transition-all duration-300 hover:border-[#5D1F17] hover:bg-[#5D1F17]/5 hover:text-[#5D1F17] hover:shadow-sm disabled:opacity-50"
+                          >
+                            {resending === o.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Mail className="h-3 w-3 transition-transform group-hover:scale-110" />
+                            )}
+                            Resend
+                          </button>
+                        )}
+
                         <button
                           type="button"
-                          onClick={() => resendOrderEmail(o)}
-                          disabled={resending === o.id}
-                          className="group inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3.5 py-2 text-[10px] font-bold uppercase tracking-wider text-neutral-600 transition-all duration-300 hover:border-[#5D1F17] hover:bg-[#5D1F17]/5 hover:text-[#5D1F17] hover:shadow-sm disabled:opacity-50"
+                          onClick={() => requestDelete(o)}
+                          disabled={deleting === o.id}
+                          className="group grid h-9 w-9 place-items-center rounded-lg border border-neutral-200 text-neutral-600 transition-all duration-300 hover:border-red-200 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                          title="Delete order"
                         >
-                          {resending === o.id ? (
-                            <Loader2 className="h-3 w-3 animate-spin" />
+                          {deleting === o.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
                           ) : (
-                            <Mail className="h-3 w-3 transition-transform group-hover:scale-110" />
+                            <Trash2 className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
                           )}
-                          Resend
                         </button>
-                      )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -419,6 +532,54 @@ export default function DashboardOrders() {
           </span>
         </div>
       </div>
+
+      {showDeleteModal && deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-red-200 bg-white p-6 shadow-xl">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-red-50 text-red-600">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-neutral-900">Delete order</h3>
+                <p className="text-xs text-neutral-500">This action cannot be undone.</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-neutral-600 mb-6">
+              Are you sure you want to delete order <span className="font-semibold text-neutral-900">#{deleteTarget.orderNumber}</span> for{" "}
+              <span className="font-semibold text-neutral-900">{deleteTarget.clientName}</span>?
+            </p>
+
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteTarget(null);
+                }}
+                className="rounded-full border border-neutral-200 px-5 py-2.5 text-xs font-semibold text-neutral-600 hover:border-neutral-400"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={confirmDelete}
+                disabled={deleting === deleteTarget.id}
+                className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-5 py-2.5 text-xs font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {deleting === deleteTarget.id ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="h-3.5 w-3.5" />
+                )}
+                <span>Delete</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
