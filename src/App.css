@@ -125,3 +125,61 @@
     transform: translateX(-50%);
   }
 }
+
+/* ─── Bimpe phone input ──────────────────────────────────────────── */
+.bimpe-phone-input .PhoneInput {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bimpe-phone-input .PhoneInputCountry {
+  margin-right: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.bimpe-phone-input .PhoneInputCountrySelect {
+  /* Keep the native select accessible but visually quiet */
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.bimpe-phone-input .PhoneInputCountryIcon {
+  width: 1.25rem;
+  height: auto;
+  box-shadow: none;
+  background: transparent;
+}
+
+.bimpe-phone-input .PhoneInputCountryIcon--border {
+  box-shadow: none;
+  background: transparent;
+}
+
+.bimpe-phone-input .PhoneInputInput {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.75rem; /* text-xs */
+  line-height: 1;
+  color: inherit;
+}
+
+.bimpe-phone-input .PhoneInputInput:focus,
+.bimpe-phone-input .PhoneInputInput:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border: none;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
+}

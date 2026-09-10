@@ -13,7 +13,7 @@ const COMPANY_LINKS = [
   { label: "Services", href: "/services" },
   { label: "Book", href: "/book" },
   { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "/contact" },
+  // { label: "Contact", href: "/contact" },
 ];
 
 // const RESOURCE_LINKS = [
