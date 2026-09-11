@@ -65,6 +65,7 @@ export interface BookProduct {
   active: boolean;
   sort_order: number;
   created_at: string;
+  selar_link: string | null;
 }
 
 export type OrderStatus = "pending" | "paid" | "processing" | "shipped" | "delivered" | "cancelled";

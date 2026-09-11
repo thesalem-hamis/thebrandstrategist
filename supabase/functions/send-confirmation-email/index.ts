@@ -49,6 +49,7 @@ interface OrderRow {
   total_amount: number;
   currency: string;
   order_number: string;
+  pdf_url?: string | null;
 }
 
 const BRAND_COLOR = "#5D1F17";
@@ -122,6 +123,17 @@ function serviceRequestEmail(r: ServiceRequestRow): string {
 function orderEmail(o: OrderRow): string {
   const qty = String(o.quantity);
   const unit = (o.total_amount / o.quantity / 100).toFixed(2);
+
+  const downloadBlock = o.pdf_url
+    ? `<div style="background:#faf9f7;border:1px solid #e5e5e5;border-radius:6px;padding:20px;text-align:center;margin:0 0 24px;">
+         <p style="margin:0 0 12px;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.15em;font-family:Arial,sans-serif;">Download Your Book</p>
+         <a href="${o.pdf_url}" style="display:inline-block;background:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:999px;font-size:13px;font-family:Arial,sans-serif;font-weight:bold;">Download PDF</a>
+         <p style="margin:12px 0 0;color:#777;font-size:11px;font-family:Arial,sans-serif;">This link is valid for 60 minutes.</p>
+       </div>`
+    : `<div style="background:#fff3cd;border:1px solid #ffe69c;border-radius:6px;padding:16px;text-align:center;">
+         <p style="margin:0;color:#664d03;font-size:13px;font-family:Arial,sans-serif;">Your order is being processed and will ship in 1–3 business days. We'll email you again once your package is on the way.</p>
+       </div>`;
+
   return wrapHtml(`
     <p style="margin:0 0 16px;color:#333;font-size:15px;line-height:1.6;">Dear ${o.client_name},</p>
     <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.7;">
@@ -134,11 +146,7 @@ function orderEmail(o: OrderRow): string {
       <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Unit price</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">$${unit} ${o.currency}</td></tr>
       <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Total</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">$${(o.total_amount / 100).toFixed(0)} ${o.currency}</td></tr>
     </table>
-    <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:6px;padding:16px;">
-      <p style="margin:0;color:#065f46;font-size:13px;font-family:Arial,sans-serif;">
-        📦 Your order is being processed and will ship in 1–3 business days. We'll email you again once your package is on the way.
-      </p>
-    </div>
+    ${downloadBlock}
   `);
 }
 

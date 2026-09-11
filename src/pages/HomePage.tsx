@@ -7,6 +7,7 @@ import Pricing from "@/components/home/Pricing";
 import Service from "@/components/home/Service";
 import Testimonials from "@/components/home/Testimonials";
 import Work from "@/components/home/work";
+import YouTubeSubscribe from "@/components/home/YouTubeSubscribe";
 import { ColorSection } from "@/components/providers/ColorSection";
 
 export default function HomePage() {
@@ -20,6 +21,7 @@ export default function HomePage() {
       <ColorSection color="#ffffff"><Pricing /></ColorSection>
       <ColorSection color="#000000"><Testimonials /></ColorSection>
       <ColorSection color="#FBFAF8"><HowIWork /></ColorSection>
+      <ColorSection color="#000000"><YouTubeSubscribe /></ColorSection>
       <ColorSection color="#000000"><CTA /></ColorSection>
     </>
   );

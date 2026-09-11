@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, ArrowUpRight, BookOpen, Mail, User } from "lucide-react";
+import { ShoppingCart, ArrowUpRight, BookOpen, Mail, User, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { BookProduct } from "@/lib/types";
 
@@ -289,26 +289,38 @@ export default function BooksPage() {
                         "A practical guide to building a brand that matters."}
                     </p>
 
-                    <div className="flex items-center gap-4">
-                      <span className="text-2xl font-bold text-[#5D1F17]">
-                        ${(product.price / 100).toFixed(2)}
-                      </span>
+                     <div className="flex items-center gap-4">
+                       <span className="text-2xl font-bold text-[#5D1F17]">
+                         ${(product.price / 100).toFixed(2)}
+                       </span>
 
-                      <button
-                        onClick={() => initiatePurchase(product)}
-                        disabled={purchasingId === product.id}
-                        className="ml-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#5D1F17] px-6 py-3 text-xs font-semibold text-white hover:bg-[#4A1812] shadow transition-colors disabled:opacity-50"
-                      >
-                        {purchasingId === product.id ? (
-                          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        ) : (
-                          <>
-                            <ShoppingCart className="h-3.5 w-3.5" />
-                            <span>Buy Now</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
+                       {product.selar_link ? (
+                         <a
+                           href={product.selar_link}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           className="ml-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#5D1F17] px-6 py-3 text-xs font-semibold text-white hover:bg-[#4A1812] shadow transition-colors"
+                         >
+                           <ExternalLink className="h-3.5 w-3.5" />
+                           <span>Buy on Selar</span>
+                         </a>
+                       ) : (
+                         <button
+                           onClick={() => initiatePurchase(product)}
+                           disabled={purchasingId === product.id}
+                           className="ml-auto inline-flex items-center justify-center gap-2 rounded-full bg-[#5D1F17] px-6 py-3 text-xs font-semibold text-white hover:bg-[#4A1812] shadow transition-colors disabled:opacity-50"
+                         >
+                           {purchasingId === product.id ? (
+                             <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                           ) : (
+                             <>
+                               <ShoppingCart className="h-3.5 w-3.5" />
+                               <span>Buy Now</span>
+                             </>
+                           )}
+                         </button>
+                       )}
+                     </div>
                   </div>
                 </div>
               </div>

@@ -71,10 +71,11 @@ create table if not exists public.book_products (
   image_url   text,
   pdf_url     text,
   stock_qty   integer,                                     -- null = unlimited (digital)
-  is_digital  boolean not null default false,
-  active      boolean not null default true,
-  sort_order  integer not null default 0,
-  created_at  timestamptz not null default now()
+   is_digital  boolean not null default false,
+   active      boolean not null default true,
+   sort_order  integer not null default 0,
+   selar_link  text,
+   created_at  timestamptz not null default now()
 );
 
 -- ------------------------------------------------------------

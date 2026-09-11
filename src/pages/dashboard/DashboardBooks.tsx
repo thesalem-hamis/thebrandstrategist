@@ -25,6 +25,7 @@ const EMPTY_FORM = {
   stock_qty: "",
   is_digital: true,
   active: true,
+  selar_link: "",
 };
 
 type UploadField = "image_url" | "pdf_url";
@@ -140,6 +141,7 @@ export default function DashboardBooks() {
       stock_qty: product.stock_qty?.toString() ?? "",
       is_digital: product.is_digital ?? true,
       active: product.active ?? true,
+      selar_link: product.selar_link ?? "",
     });
 
     setUploadMessage(null);
@@ -549,6 +551,7 @@ export default function DashboardBooks() {
         stock_qty: stockQty,
         is_digital: form.is_digital,
         active: form.active,
+        selar_link: form.selar_link?.trim() || null,
       };
 
       // --------------------------------------------------------
@@ -1311,6 +1314,34 @@ export default function DashboardBooks() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* Selar Link */}
+
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="selar_link"
+                  className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-neutral-400"
+                >
+                  Selar Link (Optional)
+                </label>
+                <p className="text-[11px] text-neutral-500">
+                  Fill this to redirect to an external Selar store
+                  page instead of Paystack checkout.
+                </p>
+                <input
+                  id="selar_link"
+                  type="url"
+                  value={form.selar_link ?? ""}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      selar_link: e.target.value,
+                    })
+                  }
+                  placeholder="https://selar.co/your-book-link"
+                  className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-xs outline-none focus:border-[#5D1F17]"
+                />
               </div>
 
               {/* Digital */}

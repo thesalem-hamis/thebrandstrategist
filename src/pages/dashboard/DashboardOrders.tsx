@@ -168,6 +168,10 @@ export default function DashboardOrders() {
         throw error;
       }
 
+      setItems((current) =>
+        current.filter((item) => item.id !== deleteTarget.id)
+      );
+
       setMessage({
         tone: "ok",
         text: `Order #${deleteTarget.orderNumber} deleted successfully.`,
