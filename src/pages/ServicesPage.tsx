@@ -278,7 +278,7 @@ export const PRICING_TIERS: PricingTier[] = [
     highlighted: false,
     paymentRequired: false,
     ctaText: "Request a Call",
-    ctaLink: "/services/strategy-1500",
+    ctaLink: "/services/strategy-setup",
   },
 ];
 
@@ -485,7 +485,7 @@ export default function ServicesPage() {
         >
           <p className="text-xs sm:text-sm leading-relaxed text-neutral-700 font-normal">
             Whether you need a focused strategy session, a strategic positioning
-            framework, or a complete brand identity system — there's a structured path forward.
+            framework, or a complete brand identity system there's a structured path forward.
             Each service is designed to deliver absolute clarity and actionable next steps,
             without unnecessary complexity.
           </p>
@@ -531,7 +531,7 @@ export default function ServicesPage() {
           </h2>
           <p className="mt-3 max-w-xl text-xs sm:text-sm text-neutral-300 mx-auto leading-relaxed">
             Share a few details about your brand and goals, and we'll recommend the right
-            path forward — including budget-friendly options for early-stage teams.
+            path forward including budget-friendly options for early-stage teams.
           </p>
           <Link
             to="/book-a-session"

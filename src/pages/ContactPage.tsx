@@ -137,7 +137,7 @@ export default function ContactPage() {
                   Inquiry Received
                 </h3>
                 <p className="text-xs text-neutral-500 leading-relaxed max-w-sm mb-1">
-                  Thank you, <span className="font-semibold text-neutral-900">{form.name.split(" ")[0]}</span> — your message has been delivered to Bimpe's dashboard.
+                  Thank you, <span className="font-semibold text-neutral-900">{form.name.split(" ")[0]}</span>, your message has been delivered to Bimpe's dashboard.
                 </p>
                 <p className="text-xs text-neutral-500 leading-relaxed max-w-sm mb-6">
                   You'll hear back at <span className="font-semibold text-neutral-900">{form.email}</span> within two business days.

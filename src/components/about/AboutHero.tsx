@@ -138,7 +138,7 @@ export function AboutHero() {
                 Our Mission
               </h3>
               <p className="col-span-6 text-xs sm:text-sm text-neutral-600 leading-relaxed">
-                We are dedicated to building identity architectures that connect strategy with high-impact design—crafting sustainable brand systems engineered to scale and endure.
+                We are dedicated to building identity architectures that connect strategy with high-impact design crafting sustainable brand systems engineered to scale and endure.
               </p>
             </motion.div>
           </div>

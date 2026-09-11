@@ -27,7 +27,7 @@ const milestones: Milestone[] = [
   {
     year: "2020",
     title: "Scaling The Practice",
-    desc: "Expanded into full brand systems — strategy, identity, and communication — for growth-stage companies.",
+    desc: "Expanded into full brand systems strategy, identity, and communication for growth-stage companies.",
     highlight: "ENGINEERING SCALABLE ENTERPRISE BRAND SYSTEMS",
   },
   {
