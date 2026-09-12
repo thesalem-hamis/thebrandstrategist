@@ -234,11 +234,34 @@ export default function BooksPage() {
         )}
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 border-t-[#5D1F17]" />
-            <p className="mt-4 text-xs text-neutral-500">
-              Loading books…
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 animate-pulse">
+            {[1, 2].map((_, i) => (
+              <div
+                key={i}
+                className="lg:col-span-6 xl:col-span-6"
+              >
+                <div className="group grid grid-cols-1 md:grid-cols-12 gap-8 border border-zinc-200 rounded-2xl overflow-hidden shadow-sm">
+                  <div className="md:col-span-4 bg-neutral-200 flex items-center justify-center p-6">
+                    <div className="h-[280px] w-full max-w-[180px] rounded-lg bg-neutral-300" />
+                  </div>
+
+                  <div className="md:col-span-8 p-6 sm:p-10 flex flex-col">
+                    <div className="mb-4 h-3 w-24 rounded bg-neutral-300" />
+                    <div className="mb-2 h-5 sm:h-6 w-48 rounded bg-neutral-300 uppercase" />
+                    <div className="mb-3 h-3 w-20 rounded bg-neutral-300" />
+                    <div className="mb-6 space-y-1.5">
+                      <div className="h-3 w-full rounded bg-neutral-300" />
+                      <div className="h-3 w-full rounded bg-neutral-300" />
+                      <div className="h-3 w-3/4 rounded bg-neutral-300" />
+                    </div>
+                    <div className="mt-auto flex items-center justify-between">
+                      <div className="h-6 w-16 rounded bg-neutral-300" />
+                      <div className="h-9 w-28 rounded-full bg-neutral-300" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : products.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
