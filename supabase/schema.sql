@@ -174,9 +174,9 @@ $$;
 -- ============================================================
 insert into public.services (id, name, description, price, currency, payment_required, sort_order) values
   ('consultation-100', '1-on-1 Strategy Consultation', 'A 60-minute virtual strategy session covering brand assessment, opportunity identification, and next steps.', 10000, 'USD', true, 1),
-  ('strategy-1500', 'Strategy / Setup', 'End-to-end strategic positioning, communication systems, and growth roadmap tailored to your business.', 150000, 'USD', false, 2),
+  ('strategy-setup', 'Personal Brand Strategy', 'End-to-end strategic positioning, communication systems, and a 90-day growth roadmap tailored to your business.', 200000, 'USD', false, 2),
   ('personal-brand', 'Personal Brand Strategy', 'Executive personal branding to position founders and leaders as industry authorities.', 150000, 'USD', false, 3),
-  ('brand-identity', 'Brand Identity System', 'Complete visual identity, messaging architecture, and brand guidelines.', 200000, 'USD', false, 4),
+  ('brand-identity', 'Brand Identity', 'Complete visual identity system, messaging architecture, and brand guidelines.', 150000, 'USD', false, 4),
   ('book-product', 'The Brand Strategist — Book', 'A practical guide to building a brand that matters.', 3500, 'USD', true, 5)
 on conflict (id) do update set
   name = excluded.name,
