@@ -1,53 +1,37 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+import logo1 from "../../assets/schoolofex.png"
+import logo2 from "../../assets/sola.png";
+import logo3 from "../../assets/spara.png";
+import logo4 from "../../assets/Mc.png";
+
 interface Logo {
   id: string | number;
   name: string;
-  icon: React.ReactNode;
+  src: string;
 }
 
 const sampleLogos: Logo[] = [
   {
     id: 1,
-    name: "Logoipsum 1",
-    icon: (
-      <div className="flex items-center gap-2 font-bold text-lg tracking-tight">
-        <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-          <circle cx="7" cy="7" r="3" />
-          <circle cx="17" cy="7" r="3" />
-          <circle cx="7" cy="17" r="3" />
-          <circle cx="17" cy="17" r="3" />
-        </svg>
-        <span className="font-semibold text-base">Logoipsum</span>
-      </div>
-    ),
+    name: "Logo 1",
+    src: logo1,
   },
   {
     id: 2,
-    name: "Logoipsum 2",
-    icon: (
-      <div className="flex items-center gap-2 font-bold text-lg tracking-tight">
-        <svg className="w-6 h-6 fill-none stroke-current stroke-[2.5]" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M7 12l10 0M12 7l0 10" strokeLinecap="round" />
-        </svg>
-        <span className="font-semibold text-base">logoipsum</span>
-      </div>
-    ),
+    name: "Logo 2",
+    src: logo2,
   },
   {
     id: 3,
-    name: "Logoipsum 3",
-    icon: (
-      <div className="flex items-center gap-2 font-bold text-lg tracking-tight">
-        <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-          <rect x="4" y="6" width="16" height="4" rx="2" />
-          <rect x="4" y="14" width="16" height="4" rx="2" />
-        </svg>
-        <span className="font-semibold text-base">logoipsum</span>
-      </div>
-    ),
+    name: "Logo 3",
+    src: logo3,
+  },
+  {
+    id: 4,
+    name: "Logo 4",
+    src: logo4,
   },
 ];
 
@@ -91,10 +75,14 @@ export const Partner: React.FC = () => {
             {logos.map((logo, index) => (
               <motion.div
                 key={`${logo.id}-${index}`}
-                className="cursor-pointer text-slate-400 hover:text-slate-700 transition-colors duration-300 flex-shrink-0 flex items-center"
-                whileHover={{ scale: 1.03 }}
+                className="cursor-pointer grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 flex-shrink-0 flex items-center"
+                whileHover={{ scale: 1.05 }}
               >
-                {logo.icon}
+                <img
+                  src={logo.src}
+                  alt={logo.name}
+                  className="h-8 sm:h-10 w-auto object-contain"
+                />
               </motion.div>
             ))}
           </motion.div>

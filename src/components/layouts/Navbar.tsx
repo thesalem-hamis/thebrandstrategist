@@ -211,7 +211,7 @@ export function Navbar() {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-                onClick={() => handleMobileNavigate("/#contact")}
+                onClick={() => handleMobileNavigate("/book-a-session")}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-[#5D1F17] py-5 text-sm font-semibold uppercase tracking-wider text-white shadow-xl transition-colors duration-200 hover:bg-[#4a1812]"
               >
                 BOOK A CONSULTATION

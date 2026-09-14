@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, ArrowUpRight, BookOpen, Mail, User, ExternalLink } from "lucide-react";
+import { ShoppingCart, ArrowDownRight, BookOpen, Mail, User, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { BookProduct } from "@/lib/types";
+
 
 export default function BooksPage() {
   const [products, setProducts] = useState<BookProduct[]>([]);
@@ -203,7 +204,7 @@ export default function BooksPage() {
             to="/"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#5D1F17] bg-white text-[#5D1F17] hover:border-neutral-900 hover:text-neutral-900 text-xs font-semibold tracking-wider uppercase transition-all duration-200 shadow hover:shadow-md group/btn mb-8"
           >
-            <ArrowUpRight className="w-3.5 h-3.5 rotate-180 transition-transform duration-300 group-hover/btn:-translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+            <ArrowDownRight className="w-3.5 h-3.5 rotate-180 transition-transform duration-300 group-hover/btn:-translate-x-0.5 group-hover/btn:-translate-y-0.5" />
             <span>GO BACK</span>
           </Link>
 
