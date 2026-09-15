@@ -82,7 +82,7 @@ export function Testimonials() {
 
       {/* Header Section */}
       <div className="relative z-10 max-w-4xl mx-auto text-center px-6 mb-16 sm:mb-20 space-y-4">
-        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+        <h2 className="text-3xl sm:text-5xl lg:text-5xl font-semibold font-sans tracking-tight leading-tight">
           Built On Trust, Refined <br />
           <span className="font-serif italic font-normal text-zinc-300">
             Through Experience

@@ -272,12 +272,12 @@ export default function ServiceRequestPage() {
           transition={{ duration: 0.6, ease: EASE }}
           className="mb-8 sm:mb-12"
         >
-          <h1 className="text-[26px] sm:text-5xl lg:text-[68px] font-bold tracking-tight uppercase leading-[1.05] sm:leading-none text-neutral-900">
+          <h1 className="text-[26px] sm:text-5xl lg:text-[68px] font-semibold font-sans tracking-tight uppercase leading-[1.05] sm:leading-none text-neutral-900">
             {service.title
               .toUpperCase()
               .replace("FULL BRANDING", "BRANDING")
               .trim()}{" "}
-            <span className="font-serif italic text-[#5D1F17]">
+            <span className="font-sans font-semibold text-[#5D1F17]">
               REQUEST
             </span>
           </h1>
@@ -301,7 +301,7 @@ export default function ServiceRequestPage() {
                 initial={{ scale: 0.85, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.3, ease: EASE }}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#5D1F17] bg-[#5D1F17] text-[10px] font-bold text-white"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#5D1F17] bg-[#5D1F17] text-[10px] font-bold text-white font-sans "
               >
                 {step === "confirmed" ? (
                   <Check className="h-3.5 w-3.5" />

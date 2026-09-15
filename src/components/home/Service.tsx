@@ -592,9 +592,9 @@ export function Services() {
         {/* Header Layout */}
         <div className="flex justify-end w-full pt-1 sm:pt-2 z-20">
           <div className="text-right max-w-[280px] sm:max-w-lg">
-            <h1 className="text-xl sm:text-4xl lg:text-5xl font-medium tracking-tight text-neutral-900 leading-[1.08]">
+            <h1 className="text-xl sm:text-4xl lg:text-5xl font-semibold font-sans italic tracking-tight text-neutral-900 leading-[1.08]">
               Architecting <br />
-              <span className="font-serif italic font-normal text-[#8B261D]">
+              <span className="font-serif italic font-semibold text-[#8B261D]">
                 Market Leadership
               </span>
             </h1>

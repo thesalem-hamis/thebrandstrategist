@@ -36,7 +36,7 @@ export function CTA() {
       <div className="container-edit px-6 sm:px-10 md:px-16 relative z-10 max-w-3xl mx-auto flex flex-col items-center">
         <Reveal>
           {/* Reduced Font Size Headline */}
-          <h2 className="font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-normal tracking-normal text-white leading-[1.2] text-balance">
+          <h2 className="font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-semibold tracking-normal text-white leading-[1.2] text-balance">
             Ready To Build A Brand That <br />
             <span className="font-serif italic font-normal text-white/90">
               Creates Impact

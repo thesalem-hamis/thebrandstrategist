@@ -21,7 +21,7 @@ export interface Project {
 
 export const PROJECTS_HEADER = {
   title: "ALL WORK",
-  count: 7,
+  count: 6,
   subtitle:
     "Selected case studies across executive advisory, brand strategy, personal branding, visual identity systems, and foundation architecture.",
 };

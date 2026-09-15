@@ -18,7 +18,7 @@ export function AboutHero() {
           transition={{ duration: 0.6 }}
           className="mb-8 sm:mb-12 mt-10 sm:mt-16 lg:mt-20"
         >
-          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-semibold sm:font-light uppercase tracking-tight leading-none text-neutral-900 whitespace-nowrap">
+          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-semibold font-sans uppercase tracking-[-0.01em] leading-tight text-neutral-900 whitespace-nowrap">
             MEET BIMPE MOHAMMED
           </h1>
         </motion.div>
@@ -102,8 +102,8 @@ export function AboutHero() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-4"
           >
-            <h2 className="text-2xl sm:text-3xl font-light tracking-tight text-neutral-900 uppercase">
-              INSIDE <span className="font-serif italic text-[#5D1F17]">BIMPE</span>
+            <h2 className="text-2xl sm:text-3xl font-semibold font-sans tracking-[-0.04em] text-neutral-900 uppercase">
+              INSIDE <span className="font-sans font-semibold text-[#5D1F17]">BIMPE</span>
             </h2>
           </motion.div>
 

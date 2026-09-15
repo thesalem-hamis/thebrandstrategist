@@ -20,12 +20,12 @@ export function ProjectsPage() {
 
         {/* Page Header */}
         <div className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-baseline justify-between pb-6 gap-6">
-          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-bold tracking-tight uppercase leading-none text-neutral-900 whitespace-nowrap">
+          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-bold tracking-[-0.04em] uppercase leading-tight text-neutral-900 whitespace-nowrap font-sans">
             {PROJECTS_HEADER.title}
           </h1>
           
           <div className="flex items-start gap-2 max-w-xl text-neutral-700 text-xs sm:text-sm leading-relaxed font-normal">
-            <span className="font-mono text-xs text-[#5D1F17] font-semibold">
+            <span className="font-serif text-xs text-[#5D1F17] font-semibold">
               ({PROJECTS_HEADER.count})
             </span>
             <p>{PROJECTS_HEADER.subtitle}</p>
@@ -56,11 +56,11 @@ export function ProjectsPage() {
                 <div className="lg:col-span-3 p-6 sm:p-8 flex flex-col justify-between">
                   <div>
                     <Link to={`/projects/${project.slug}`}>
-                      <h2 className="text-xl sm:text-2xl lg:text-3xl font-light tracking-tight uppercase text-neutral-900 leading-tight mb-2 hover:text-[#5D1F17] transition-colors">
+                      <h2 className="text-xl sm:text-2xl lg:text-3xl font-normal font-sans tracking-tight uppercase text-neutral-900 leading-tight mb-2 hover:text-[#5D1F17] transition-colors">
                         {project.title}
                       </h2>
                     </Link>
-                    <span className="text-xs font-mono text-[#5D1F17] font-semibold uppercase tracking-wider block">
+                    <span className="text-xs font-sans text-[#5D1F17] font-semibold uppercase tracking-wider block">
                       {project.subtitle}
                     </span>
                   </div>
@@ -102,7 +102,7 @@ export function ProjectsPage() {
                 <div className="lg:col-span-2 p-6 sm:p-8 flex items-start justify-start lg:justify-end">
                   <Link
                     to={`/projects/${project.slug}`}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-[#5D1F17] hover:text-neutral-900 transition-colors group/link"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold font-sans tracking-wider uppercase text-[#5D1F17] hover:text-neutral-900 transition-colors group/link"
                   >
                     <span>VIEW PROJECT</span>
                     <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />

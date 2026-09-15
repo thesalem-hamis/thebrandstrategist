@@ -235,12 +235,12 @@ export function Work() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="space-y-4 max-w-2xl"
           >
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-neutral-300">
+            <p className="text-[11px] font-bold font-sans uppercase tracking-[0.2em] text-neutral-300">
               SELECTED WORK
             </p>
-            <h2 className="text-4xl sm:text-5xl lg:text-[62px] font-medium tracking-tight text-white leading-[1.05]">
+            <h2 className="text-4xl sm:text-5xl lg:text-[62px] font-semibold font-sans tracking-tight text-white leading-[1.05]">
               Brands Built To <br />
-              <span className="font-serif italic font-normal text-white">
+              <span className="font-sans font-semibold  text-white">
                 Create Impact
               </span>
             </h2>

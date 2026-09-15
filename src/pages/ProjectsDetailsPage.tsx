@@ -211,10 +211,10 @@ export function ProjectDetailPage() {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           className="border-b border-neutral-300 pb-12 mb-12 sm:mb-16"
         >
-          <span className="text-xs font-mono text-[#5D1F17] font-bold uppercase tracking-wider block mb-4">
+          <span className="text-xs font-sans text-[#5D1F17] font-bold uppercase tracking-wider block mb-4">
             {project.subtitle}
           </span>
-          <h1 className="text-3xl sm:text-6xl lg:text-[72px] font-bold uppercase tracking-tight leading-none text-neutral-950 mb-6">
+          <h1 className="text-3xl sm:text-6xl lg:text-[72px] font-semibold font-sans uppercase tracking-tight leading-none text-neutral-950 mb-6">
             {project.title}
           </h1>
           <p className="text-xs sm:text-sm leading-relaxed text-neutral-800 font-medium max-w-3xl">
@@ -295,10 +295,10 @@ export function ProjectDetailPage() {
               transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
               className="grid grid-cols-12 gap-4 pb-8 items-start"
             >
-              <span className="col-span-2 text-xs font-mono text-neutral-950 font-bold">01</span>
+              <span className="col-span-2 text-xs font-sans text-neutral-950 font-bold">01</span>
               <div className="col-span-10 space-y-2">
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 uppercase">
-                  PROJECT <span className="font-serif italic font-semibold text-[#5D1F17]">OVERVIEW</span>
+                <h2 className="text-2xl sm:text-3xl font-semibold font-sans tracking-tight text-neutral-950 uppercase">
+                  PROJECT <span className="font-sans font-semibold text-[#5D1F17]">OVERVIEW</span>
                 </h2>
                 <p className="text-xs sm:text-sm text-neutral-800 leading-relaxed font-normal">
                   {project.overview}
@@ -314,10 +314,10 @@ export function ProjectDetailPage() {
               transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
               className="grid grid-cols-12 gap-4 py-8 items-start"
             >
-              <span className="col-span-2 text-xs font-mono text-neutral-950 font-bold">02</span>
+              <span className="col-span-2 text-xs font-sans text-neutral-950 font-bold">02</span>
               <div className="col-span-10 space-y-4">
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 uppercase">
-                  STRATEGIC <span className="font-serif italic font-semibold text-[#5D1F17]">PROCESS</span>
+                <h2 className="text-2xl sm:text-3xl font-semibold font-sans tracking-tight text-neutral-950 uppercase">
+                  STRATEGIC <span className="font-sans font-semibold text-[#5D1F17]">PROCESS</span>
                 </h2>
                 <ul className="space-y-3 divide-y divide-neutral-200">
                   {project.process.map((step, idx) => (
@@ -337,10 +337,10 @@ export function ProjectDetailPage() {
               transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
               className="grid grid-cols-12 gap-4 pt-8 items-start"
             >
-              <span className="col-span-2 text-xs font-mono text-neutral-950 font-bold">03</span>
+              <span className="col-span-2 text-xs font-sans text-neutral-950 font-bold">03</span>
               <div className="col-span-10 space-y-2">
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 uppercase">
-                  BRAND <span className="font-serif italic font-semibold text-[#5D1F17]">OUTCOME</span>
+                <h2 className="text-2xl sm:text-3xl font-semibold font-sans tracking-tight text-neutral-950 uppercase">
+                  BRAND <span className="font-sans font-semibold text-[#5D1F17]">OUTCOME</span>
                 </h2>
                 <p className="text-xs sm:text-sm text-neutral-800 leading-relaxed font-normal">
                   {project.outcome}

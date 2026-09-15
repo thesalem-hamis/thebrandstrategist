@@ -52,7 +52,7 @@ export function AboutJourney() {
         <p className="text-xs font-mono tracking-widest text-neutral-400 uppercase mb-3">
           MY JOURNEY
         </p>
-        <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-neutral-900 leading-tight max-w-2xl mb-12 sm:mb-16 uppercase">
+        <h2 className="text-3xl sm:text-5xl font-light tracking-tight text-neutral-900 leading-tight max-w-2xl mb-12 sm:mb-16 uppercase font-sans">
           FROM BRAND STRATEGY <br />
           TO INTEGRATED SYSTEMS
         </h2>

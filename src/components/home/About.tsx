@@ -312,7 +312,10 @@ export const About: React.FC = () => {
 
           {/* Title Section */}
           <motion.div style={{ opacity, y }} className="mb-7">
-            <h1 className="text-4xl sm:text-5xl lg:text-[56px] font-semibold tracking-tight text-neutral-900 leading-[1.08]">
+            <h1 className=
+            // "text-4xl sm:text-5xl lg:text-[45px] font-semibold font-sans tracking-tight text-neutral-900 leading-[1.08]"
+            "text-3xl lg:text-[45px]  sm:text-3xl lg:text-4xl font-semibold tracking-[-0.04em] text-neutral-900 leading-tight text-balance"
+            >
               Strategist, Partner,<br />
               Advisor For Your<br />
               <span className="text-[#5D1F17]">Brand’s Growth</span>
@@ -339,7 +342,7 @@ export const About: React.FC = () => {
             href="/about"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="group inline-flex items-center gap-2 w-fit text-[#5D1F17] hover:text-[#4A1812] font-bold text-xs uppercase tracking-wider transition-all duration-300"
+            className="group inline-flex items-center gap-2 w-fit text-[#5D1F17] hover:text-[#4A1812] font-bold text-xs font-sans uppercase tracking-wider transition-all duration-300"
           >
             <span>LEARN MORE</span>
             <svg
