@@ -3,6 +3,7 @@ import {
   FaWhatsapp,
   FaBehance,
   FaInstagram,
+  FaYoutube,
 } from "react-icons/fa6";
 
 import logo from "@/assets/logo.svg";
@@ -36,6 +37,11 @@ const SOCIAL_LINKS = [
     icon: FaBehance,
     href: "https://www.behance.net/adebimpmohamme",
     label: "Behance",
+  },
+  {
+    icon: FaYoutube,
+    href: "https://www.youtube.com",
+    label: "YouTube",
   },
 ];
 
