@@ -303,7 +303,7 @@ export function Footer() {
                 hover:text-[#6B1F3A]
               "
             >
-              hello@example.com
+              bnmbrandhouse@gmail.com
             </a>
 
           </div>
