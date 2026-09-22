@@ -33,7 +33,7 @@ export const About: React.FC = () => {
       <div className="w-full h-[280px] sm:h-[320px] xl:h-[340px] overflow-hidden">
         <img
           src={aboutImage}
-          alt="Brand Strategist"
+          alt="Adebimpe Mohammed — Brand Strategist, Consultant and Creative Director"
           className="
             w-full h-full
             object-cover
@@ -49,25 +49,25 @@ export const About: React.FC = () => {
       <div className="bg-[#0A0A0A] text-white px-6 py-4 grid grid-cols-2 items-center border-t border-white/10">
         <div className="flex items-center justify-center gap-3">
           <span className="text-2xl sm:text-3xl font-semibold tracking-tight">
-            5x
-          </span>
-
-          <span className="text-[10px] sm:text-[11px] text-neutral-300 leading-snug">
-            Average
-            <br />
-            Client ROI
-          </span>
-        </div>
-
-        <div className="flex items-center justify-center gap-3 border-l border-white/20">
-          <span className="text-2xl sm:text-3xl font-semibold tracking-tight">
             10+
           </span>
 
           <span className="text-[10px] sm:text-[11px] text-neutral-300 leading-snug">
             Years
             <br />
-            Of Experience
+            Experience
+          </span>
+        </div>
+
+        <div className="flex items-center justify-center gap-3 border-l border-white/20">
+          <span className="text-2xl sm:text-3xl font-semibold tracking-tight">
+            500+
+          </span>
+
+          <span className="text-[10px] sm:text-[11px] text-neutral-300 leading-snug">
+            Brands &
+            <br />
+            Organisations
           </span>
         </div>
       </div>
@@ -116,70 +116,97 @@ export const About: React.FC = () => {
           style={{ opacity, y }}
           className="lg:col-span-7 flex flex-col justify-center"
         >
-
-          {/* 1. Main Heading — Larger font, refined tracking and line-height */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.02em] text-neutral-900 leading-[1.12] text-balance max-w-[620px]">
-            Turning Business
+          {/* Main Heading */}
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] text-neutral-900 leading-[1.08] text-balance max-w-[650px]">
+            Building Brands
             <br />
-            Strategy into Market
+            Shaping Perception
             <br />
-            <span className="text-[#5D1F17] tracking-[0.01em]">Dominance</span>
+            <span className="text-[#5D1F17]">
+              Expanding Possibility.
+            </span>
           </h2>
 
-          {/* 2. Mobile Image Insertion */}
-          <div className="my-5 block lg:hidden">
+          {/* Mobile Image */}
+          <div className="my-6 block lg:hidden">
             <ImageCard />
           </div>
 
-          {/* 3. Paragraph Description */}
+          {/* Introduction */}
           <p
             className="
-              mt-2 lg:mt-4
+              mt-2 lg:mt-5
+              text-neutral-800
+              text-sm
+              sm:text-[15px]
+              leading-7
+              max-w-[570px]
+              font-medium
+            "
+          >
+            Adebimpe Mohammed is a Brand Strategist, Consultant, Creative
+            Director and Author helping businesses, founders and professionals
+            transform potential into brands that are clear, distinctive,
+            trusted and positioned for meaningful growth.
+          </p>
+
+          {/* Experience */}
+          {/* <p
+            className="
+              mt-4
               text-neutral-500
               text-sm
               sm:text-[15px]
               leading-7
-              max-w-[510px]
+              max-w-[570px]
             "
           >
-            I help founders and high-growth organisations combine positioning, business strategy, and storytelling to clearly communicate what sets them apart — driving brand authority and repeatable revenue growth.
+            For more than a decade, she has worked at the intersection of{" "}
+            <span className="text-neutral-800 font-medium">
+              strategy, human perception, creativity and business
+            </span>
+            , helping clients clarify what they represent, strengthen how they
+            are perceived and build brands capable of supporting where they are
+            going next.
+          </p> */}
+
+          {/* BNM Brand House */}
+          <p
+            className="
+              mt-4
+              text-neutral-500
+              text-sm
+              sm:text-[15px]
+              leading-7
+              max-w-[570px]
+            "
+          >
+            As Founder and Creative Director of{" "}
+            <span className="text-neutral-800 font-semibold">
+              BNM Brand House
+            </span>
+            , Adebimpe has led and contributed to brand engagements for more
+            than{" "}
+            <span className="text-neutral-800 font-semibold">
+              500 businesses, professionals and organisations
+            </span>{" "}
+            across brand strategy, positioning, rebranding, personal branding,
+            communication and creative direction.
           </p>
 
-          {/* 4. Proof / Key Differentiator Grid */}
-          <div
-            className="
-              mt-6
-              pt-5
-              border-t
-              border-black/[0.08]
-              max-w-[540px]
-              grid
-              grid-cols-2
-              gap-6
-            "
-          >
-            <div>
-              <div className="text-2xl sm:text-3xl font-medium tracking-[-0.03em] text-neutral-900">
-                95%
-              </div>
+          {/* Belief */}
+          {/* <div className="mt-6 max-w-[570px] border-l-2 border-[#5D1F17] pl-5">
+            <p className="text-sm sm:text-[15px] leading-7 text-neutral-500">
+              But the reason she does this work goes much deeper than branding.
+            </p>
 
-              <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-neutral-400">
-                Client satisfaction rate
-              </p>
-            </div>
+            <p className="mt-2 text-base sm:text-[17px] leading-7 text-neutral-900 font-semibold">
+              At the heart of it is a belief in what people, businesses and
+              ideas can become.
+            </p>
+          </div> */}
 
-            <div>
-              <div className="text-2xl sm:text-3xl font-medium tracking-[-0.03em] text-neutral-900">
-                100+
-              </div>
-
-              <p className="mt-1 text-[10px] uppercase tracking-[0.12em] text-neutral-400">
-                Brand Strategies Executed
-              </p>
-            </div>
-          </div>
-
-          {/* 5. CTA Link */}
+          {/* CTA */}
           <div className="mt-7">
             <motion.a
               href="/about"
@@ -211,20 +238,20 @@ export const About: React.FC = () => {
               />
             </motion.a>
           </div>
-
         </motion.div>
 
         {/* DESKTOP IMAGE */}
         <div className="hidden lg:flex lg:col-span-5 justify-end z-10">
           <ImageCard />
         </div>
-
       </div>
     </section>
   );
 };
 
 export default About;
+
+
 
 
 // import React, { useRef } from "react";
