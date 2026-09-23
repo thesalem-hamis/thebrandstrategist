@@ -21,7 +21,7 @@ const sampleLogos: Logo[] = [
   {
     id: 3,
     name: "SPARA",
-    src: "/spara-bg.png",
+    src: "/sparabg.png",
   },
   {
     id: 4,
@@ -117,13 +117,13 @@ export const Partner: React.FC = () => {
                     src={logo.src}
                     alt={logo.name}
                     className="
-                      max-h-10
-                      max-w-[160px]
+                      max-h-11
+                      max-w-[180px]
                       w-auto
                       object-contain
                       opacity-100
-                      lg:max-h-11
-                      lg:max-w-[175px]
+                      lg:max-h-12
+                      lg:max-w-[195px]
                     "
                   />
                 </div>
@@ -185,8 +185,8 @@ export const Partner: React.FC = () => {
                     src={logo.src}
                     alt={logo.name}
                     className="
-                      max-h-8
-                      max-w-[125px]
+                      max-h-9
+                      max-w-[140px]
                       w-auto
                       object-contain
                       opacity-100
