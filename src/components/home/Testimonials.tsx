@@ -6,6 +6,7 @@ import type { Testimonial as DBTestimonial } from "@/lib/types";
 interface Testimonial {
   id: string;
   author: string;
+  title?: string;
   role: string;
   location?: string;
   quote: string;
@@ -128,6 +129,7 @@ function mapDB(t: DBTestimonial): Testimonial {
   return {
     id: t.id,
     author: t.author,
+    title: t.title ?? undefined,
     role: t.role ?? "",
     location: t.location ?? undefined,
     quote: t.quote,
@@ -255,9 +257,14 @@ function TestimonialCard({ item }: { item: Testimonial }) {
           />
         )}
         <div className="flex flex-col text-left">
-          <span className="text-xs sm:text-sm font-bold text-zinc-900 leading-none mb-1">
+          <span className="text-xs sm:text-sm font-bold text-zinc-900 leading-none mb-0.5">
             {item.author}
           </span>
+          {item.title && (
+            <span className="text-[11px] font-semibold text-[#5D1F17] leading-none mb-1">
+              {item.title}
+            </span>
+          )}
           <span className="text-[11px] text-zinc-500 leading-none">
             {[item.role, item.location].filter(Boolean).join(" · ")}
           </span>

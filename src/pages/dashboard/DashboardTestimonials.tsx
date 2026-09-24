@@ -21,7 +21,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 }
 
 const EMPTY: Omit<Testimonial, "created_at" | "updated_at"> = {
-  id: "", author: "", role: null, location: null, quote: "", avatar: null,
+  id: "", author: "", title: null, role: null, location: null, quote: "", avatar: null,
   company_logo: null, bg_class: null, sort_order: 0, active: true,
 };
 
@@ -49,7 +49,7 @@ export default function DashboardTestimonials() {
   }
 
   function openEdit(t: Testimonial) {
-    setForm({ id: t.id, author: t.author, role: t.role, location: t.location, quote: t.quote, avatar: t.avatar, company_logo: t.company_logo, bg_class: t.bg_class, sort_order: t.sort_order, active: t.active });
+    setForm({ id: t.id, author: t.author, title: t.title, role: t.role, location: t.location, quote: t.quote, avatar: t.avatar, company_logo: t.company_logo, bg_class: t.bg_class, sort_order: t.sort_order, active: t.active });
     setSaveError(null); setShowEditor(true);
   }
 
@@ -59,6 +59,7 @@ export default function DashboardTestimonials() {
     try {
       const payload = {
         author: form.author.trim(),
+        title: form.title?.trim() || null,
         role: form.role?.trim() || null,
         location: form.location?.trim() || null,
         quote: form.quote.trim(),
@@ -149,14 +150,19 @@ export default function DashboardTestimonials() {
                 <Field label="Author Name" required>
                   <input required value={form.author} onChange={e => setForm(f => ({ ...f, author: e.target.value }))} className={inputCls} placeholder="Jane Doe" />
                 </Field>
-                <Field label="Role / Company">
-                  <input value={form.role ?? ""} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} className={inputCls} placeholder="CEO, Acme Corp" />
+                <Field label="Title">
+                  <input value={form.title ?? ""} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className={inputCls} placeholder="Brand Strategist" />
                 </Field>
               </div>
 
-              <Field label="Location">
-                <input value={form.location ?? ""} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} className={inputCls} placeholder="Lagos, Nigeria" />
-              </Field>
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <Field label="Role / Company">
+                  <input value={form.role ?? ""} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} className={inputCls} placeholder="CEO, Acme Corp" />
+                </Field>
+                <Field label="Location">
+                  <input value={form.location ?? ""} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} className={inputCls} placeholder="Lagos, Nigeria" />
+                </Field>
+              </div>
 
               <Field label="Quote" required>
                 <textarea required rows={4} value={form.quote} onChange={e => setForm(f => ({ ...f, quote: e.target.value }))} className={`${inputCls} resize-none`} placeholder="What did they say about working with you?" />
@@ -229,6 +235,7 @@ export default function DashboardTestimonials() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-semibold text-neutral-900">{t.author}</p>
+                    {t.title && <span className="text-[11px] text-[#5D1F17] font-semibold">· {t.title}</span>}
                     {t.role && <span className="text-[11px] text-neutral-400">· {t.role}</span>}
                     {t.location && <span className="text-[11px] text-neutral-400">· {t.location}</span>}
                   </div>

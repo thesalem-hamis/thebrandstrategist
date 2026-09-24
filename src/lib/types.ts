@@ -152,6 +152,7 @@ export interface Project {
 export interface Testimonial {
   id: string;
   author: string;
+  title: string | null;
   role: string | null;
   location: string | null;
   quote: string;
