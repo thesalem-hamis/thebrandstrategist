@@ -82,6 +82,7 @@ export default function ConsultationPage() {
   const [paymentReference, setPaymentReference] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [feeUsd, setFeeUsd] = useState(CONSULTATION_FEE_USD);
+  const [blockedDates, setBlockedDates] = useState<Set<string>>(new Set());
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -93,14 +94,13 @@ export default function ConsultationPage() {
 
   const isPast = (day: number) => {
     const selectedDate = new Date(year, month, day);
-
-    const currentDate = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-
+    const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     return selectedDate < currentDate;
+  };
+
+  const isBlocked = (day: number) => {
+    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    return blockedDates.has(dateStr);
   };
 
   const isToday = (day: number) => {
@@ -154,6 +154,13 @@ export default function ConsultationPage() {
     };
 
     fetchFee();
+
+    supabase
+      .from("blocked_dates")
+      .select("date")
+      .then(({ data }) => {
+        if (data) setBlockedDates(new Set(data.map((r: { date: string }) => r.date)));
+      });
   }, []);
 
   useEffect(() => {
@@ -457,7 +464,7 @@ export default function ConsultationPage() {
                   return <div key={index} />;
                 }
 
-                const disabled = isPast(day);
+                const disabled = isPast(day) || isBlocked(day);
                 const selected =
                   selectedDay === day;
 

@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-import { 
-  Loader2, 
-  Save, 
-  Video, 
-  DollarSign, 
+import {
+  Loader2,
+  Save,
+  Video,
+  DollarSign,
   Mail,
   CheckCircle2,
   AlertCircle,
   ArrowUpRight,
   Shield,
   Clock,
-  Zap
+  Zap,
+  CalendarX,
+  X,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -24,55 +26,46 @@ export default function DashboardSettings() {
   const [zoomLink, setZoomLink] = useState("");
   const [fee, setFee] = useState("100");
   const [contactEmail, setContactEmail] = useState("");
+  const [blockedDates, setBlockedDates] = useState<string[]>([]);
+  const [newBlockDate, setNewBlockDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
-  const [stats, setStats] = useState<SettingsStats>({
-    total: 3,
-    configured: 0,
-    lastUpdated: null,
-  });
+  const [stats, setStats] = useState<SettingsStats>({ total: 3, configured: 0, lastUpdated: null });
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("site_settings")
-          .select("key, value, updated_at");
-        
-        if (error) throw error;
-        
+        const [settingsRes, datesRes] = await Promise.all([
+          supabase.from("site_settings").select("key, value, updated_at"),
+          supabase.from("blocked_dates").select("date").order("date"),
+        ]);
+
+        if (settingsRes.error) throw settingsRes.error;
+
         const map = Object.fromEntries(
-          (data ?? []).map((r) => [r.key, r.value ?? ""])
+          (settingsRes.data ?? []).map((r) => [r.key, r.value ?? ""])
         );
-        
+
         const zoomValue = map.zoom_link ?? "";
         const feeValue = map.consultation_fee_usd ?? "100";
         const emailValue = map.contact_email ?? "";
-        
+
         setZoomLink(zoomValue);
         setFee(feeValue);
         setContactEmail(emailValue);
-        
-        // Calculate stats
-        const configuredCount = [zoomValue, feeValue, emailValue].filter(
-          (v) => v && v.trim() !== ""
-        ).length;
-        
-        const latestUpdate = data?.reduce((latest, row) => {
+        setBlockedDates((datesRes.data ?? []).map((r: { date: string }) => r.date));
+
+        const configuredCount = [zoomValue, feeValue, emailValue].filter((v) => v?.trim()).length;
+        const latestUpdate = settingsRes.data?.reduce((latest, row) => {
           if (!row.updated_at) return latest;
           if (!latest || row.updated_at > latest) return row.updated_at;
           return latest;
         }, null as string | null);
-        
-        setStats({
-          total: 3,
-          configured: configuredCount,
-          lastUpdated: latestUpdate,
-        });
+
+        setStats({ total: 3, configured: configuredCount, lastUpdated: latestUpdate });
       } catch (err) {
-        console.error("Error loading settings:", err);
         setMessage({ tone: "err", text: "Failed to load settings. Please try again." });
       } finally {
         setLoading(false);
@@ -81,25 +74,32 @@ export default function DashboardSettings() {
     load();
   }, []);
 
+  async function addBlockedDate() {
+    if (!newBlockDate) return;
+    const { error } = await supabase.from("blocked_dates").upsert({ date: newBlockDate }, { onConflict: "date" });
+    if (!error) {
+      setBlockedDates((prev) => [...prev, newBlockDate].sort());
+      setNewBlockDate("");
+    }
+  }
+
+  async function removeBlockedDate(date: string) {
+    await supabase.from("blocked_dates").delete().eq("date", date);
+    setBlockedDates((prev) => prev.filter((d) => d !== date));
+  }
+
   async function save(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
-
     try {
-      // Validate inputs
-      if (zoomLink && !zoomLink.startsWith("https://")) {
+      if (zoomLink && !zoomLink.startsWith("https://"))
         throw new Error("Zoom link must start with https://");
-      }
-      
-      if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+      if (contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail))
         throw new Error("Please enter a valid email address");
-      }
-      
       const feeValue = parseInt(fee);
-      if (isNaN(feeValue) || feeValue < 1) {
+      if (isNaN(feeValue) || feeValue < 1)
         throw new Error("Consultation fee must be at least ₦1");
-      }
 
       const updates = [
         { key: "zoom_link", value: zoomLink.trim() },
@@ -110,35 +110,16 @@ export default function DashboardSettings() {
       for (const u of updates) {
         const { error } = await supabase
           .from("site_settings")
-          .upsert(
-            { ...u, updated_at: new Date().toISOString() },
-            { onConflict: "key" }
-          );
-        
+          .upsert({ ...u, updated_at: new Date().toISOString() }, { onConflict: "key" });
         if (error) throw error;
       }
 
-      // Update stats
-      const configuredCount = [zoomLink.trim(), String(feeValue), contactEmail.trim()].filter(
-        (v) => v && v.trim() !== ""
-      ).length;
-      
-      setStats({
-        ...stats,
-        configured: configuredCount,
-        lastUpdated: new Date().toISOString(),
-      });
-
+      const configuredCount = [zoomLink.trim(), String(feeValue), contactEmail.trim()].filter((v) => v?.trim()).length;
+      setStats({ ...stats, configured: configuredCount, lastUpdated: new Date().toISOString() });
       setMessage({ tone: "ok", text: "Settings saved successfully!" });
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setMessage(null);
-      }, 3000);
+      setTimeout(() => setMessage(null), 3000);
     } catch (err) {
-      console.error("Save error:", err);
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      setMessage({ tone: "err", text: `Failed to save: ${errorMessage}` });
+      setMessage({ tone: "err", text: `Failed to save: ${err instanceof Error ? err.message : String(err)}` });
     } finally {
       setSaving(false);
     }
@@ -176,15 +157,9 @@ export default function DashboardSettings() {
       {/* Header */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-neutral-400">
-            Configuration
-          </p>
-          <h1 className="mt-1 text-2xl sm:text-3xl font-light tracking-tight text-neutral-900">
-            Settings
-          </h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Configure your consultation preferences and contact details.
-          </p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-neutral-400">Configuration</p>
+          <h1 className="mt-1 text-2xl sm:text-3xl font-light tracking-tight text-neutral-900">Settings</h1>
+          <p className="mt-1 text-sm text-neutral-500">Configure your consultation preferences and contact details.</p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-emerald-200/60 bg-emerald-50 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">
           <span className="relative flex h-2 w-2">
@@ -195,7 +170,7 @@ export default function DashboardSettings() {
         </div>
       </div>
 
-      {/* Settings Overview Cards */}
+      {/* Overview Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {settingsCards.map((card) => (
           <div
@@ -205,12 +180,8 @@ export default function DashboardSettings() {
             <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${card.accent} opacity-60`} />
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">
-                  {card.label}
-                </p>
-                <p className={`mt-2 text-sm font-semibold truncate ${
-                  card.status === "active" ? "text-neutral-900" : "text-neutral-400"
-                }`}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-500">{card.label}</p>
+                <p className={`mt-2 text-sm font-semibold truncate ${card.status === "active" ? "text-neutral-900" : "text-neutral-400"}`}>
                   {card.value}
                 </p>
               </div>
@@ -219,14 +190,8 @@ export default function DashboardSettings() {
               </div>
             </div>
             <div className="relative mt-3">
-              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                card.status === "active"
-                  ? "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200/60"
-                  : "bg-neutral-100 text-neutral-500 ring-1 ring-inset ring-neutral-200/60"
-              }`}>
-                <span className={`h-1.5 w-1.5 rounded-full ${
-                  card.status === "active" ? "bg-emerald-500" : "bg-neutral-400"
-                }`} />
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${card.status === "active" ? "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200/60" : "bg-neutral-100 text-neutral-500 ring-1 ring-inset ring-neutral-200/60"}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${card.status === "active" ? "bg-emerald-500" : "bg-neutral-400"}`} />
                 {card.status === "active" ? "Active" : "Pending"}
               </span>
             </div>
@@ -236,18 +201,8 @@ export default function DashboardSettings() {
 
       {/* Message */}
       {message && (
-        <div
-          className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-medium ${
-            message.tone === "ok"
-              ? "border-emerald-200/60 bg-emerald-50 text-emerald-700"
-              : "border-red-200/60 bg-red-50 text-red-700"
-          }`}
-        >
-          {message.tone === "ok" ? (
-            <CheckCircle2 className="h-4 w-4 shrink-0" />
-          ) : (
-            <AlertCircle className="h-4 w-4 shrink-0" />
-          )}
+        <div className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-xs font-medium ${message.tone === "ok" ? "border-emerald-200/60 bg-emerald-50 text-emerald-700" : "border-red-200/60 bg-red-50 text-red-700"}`}>
+          {message.tone === "ok" ? <CheckCircle2 className="h-4 w-4 shrink-0" /> : <AlertCircle className="h-4 w-4 shrink-0" />}
           {message.text}
         </div>
       )}
@@ -259,38 +214,29 @@ export default function DashboardSettings() {
           <p className="text-xs text-neutral-500">Loading settings…</p>
         </div>
       ) : (
-        <form 
-          onSubmit={save} 
-          className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-sm"
-        >
+        <form onSubmit={save} className="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white shadow-sm">
           <div className="border-b border-neutral-100 bg-neutral-50/40 px-6 py-4">
-            <h2 className="text-sm font-semibold tracking-tight text-neutral-900">
-              Consultation Settings
-            </h2>
-            <p className="mt-0.5 text-[11px] text-neutral-500">
-              These settings control your booking and payment flow
-            </p>
+            <h2 className="text-sm font-semibold tracking-tight text-neutral-900">Consultation Settings</h2>
+            <p className="mt-0.5 text-[11px] text-neutral-500">These settings control your booking and payment flow</p>
           </div>
 
           <div className="space-y-6 p-6">
             {/* Zoom Link */}
             <div>
               <label className="mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">
-                <Video className="h-3.5 w-3.5" />
-                Zoom Meeting Link
+                <Video className="h-3.5 w-3.5" />Zoom Meeting Link
               </label>
               <input
                 type="url"
                 value={zoomLink}
                 onChange={(e) => setZoomLink(e.target.value)}
                 placeholder="https://zoom.us/j/…"
-                className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-all duration-300 focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+                className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-all focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
               />
               <div className="mt-2 flex items-start gap-2 rounded-lg bg-blue-50/50 p-3">
                 <Zap className="h-3.5 w-3.5 mt-0.5 shrink-0 text-blue-600" />
                 <p className="text-[11px] leading-relaxed text-blue-700">
-                  This link is emailed to clients automatically after successful payment. Use a
-                  recurring/personal meeting room link so it stays valid for every session.
+                  This link is emailed to clients automatically after successful payment. Use a recurring/personal meeting room link so it stays valid for every session.
                 </p>
               </div>
             </div>
@@ -298,46 +244,80 @@ export default function DashboardSettings() {
             {/* Consultation Fee */}
             <div>
               <label className="mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">
-                <DollarSign className="h-3.5 w-3.5" />
-                Consultation Fee (USD)
+                <DollarSign className="h-3.5 w-3.5" />Consultation Fee (USD)
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-neutral-400">
-                  ₦
-                </span>
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-neutral-400">₦</span>
                 <input
                   type="number"
                   min="1"
                   value={fee}
                   onChange={(e) => setFee(e.target.value)}
-                  className="w-full rounded-xl border border-neutral-200 py-2.5 pl-8 pr-4 text-sm outline-none transition-all duration-300 focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+                  className="w-full rounded-xl border border-neutral-200 py-2.5 pl-8 pr-4 text-sm outline-none transition-all focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
                 />
               </div>
               <div className="mt-2 flex items-start gap-2 rounded-lg bg-emerald-50/50 p-3">
                 <Clock className="h-3.5 w-3.5 mt-0.5 shrink-0 text-emerald-600" />
-                <p className="text-[11px] leading-relaxed text-emerald-700">
-                  Charged via Paystack at checkout. Changes apply to new bookings immediately.
-                </p>
+                <p className="text-[11px] leading-relaxed text-emerald-700">Charged via Paystack at checkout. Changes apply to new bookings immediately.</p>
               </div>
             </div>
 
             {/* Contact Email */}
             <div>
               <label className="mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">
-                <Mail className="h-3.5 w-3.5" />
-                Contact Email
+                <Mail className="h-3.5 w-3.5" />Contact Email
               </label>
               <input
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
-                className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-all duration-300 focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+                className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-all focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
                 placeholder="you@example.com"
               />
               <div className="mt-2 flex items-start gap-2 rounded-lg bg-amber-50/50 p-3">
                 <Shield className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-600" />
-                <p className="text-[11px] leading-relaxed text-amber-700">
-                  Used for booking notifications and client communications.
+                <p className="text-[11px] leading-relaxed text-amber-700">Used for booking notifications and client communications.</p>
+              </div>
+            </div>
+
+            {/* Blocked Dates */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400">
+                <CalendarX className="h-3.5 w-3.5" />Blocked / Unavailable Dates
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={newBlockDate}
+                  min={new Date().toISOString().slice(0, 10)}
+                  onChange={(e) => setNewBlockDate(e.target.value)}
+                  className="flex-1 rounded-xl border border-neutral-200 px-4 py-2.5 text-sm outline-none transition-all focus:border-[#5D1F17] focus:ring-2 focus:ring-[#5D1F17]/10"
+                />
+                <button
+                  type="button"
+                  onClick={addBlockedDate}
+                  disabled={!newBlockDate}
+                  className="rounded-xl bg-[#5D1F17] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#4A1812] disabled:opacity-40 transition-colors"
+                >
+                  Block
+                </button>
+              </div>
+              {blockedDates.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {blockedDates.map((date) => (
+                    <span key={date} className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] font-semibold text-red-700">
+                      {new Date(date + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+                      <button type="button" onClick={() => removeBlockedDate(date)} className="hover:text-red-900">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="mt-2 flex items-start gap-2 rounded-lg bg-red-50/50 p-3">
+                <CalendarX className="h-3.5 w-3.5 mt-0.5 shrink-0 text-red-500" />
+                <p className="text-[11px] leading-relaxed text-red-700">
+                  Blocked dates will appear greyed out on the booking calendar and cannot be selected by clients.
                 </p>
               </div>
             </div>
@@ -345,28 +325,17 @@ export default function DashboardSettings() {
 
           <div className="flex items-center justify-between border-t border-neutral-100 bg-neutral-50/40 px-6 py-4">
             <div className="text-[10px] text-neutral-500">
-              {stats.lastUpdated && (
-                <span>
-                  Last updated: {new Date(stats.lastUpdated).toLocaleString()}
-                </span>
-              )}
+              {stats.lastUpdated && <span>Last updated: {new Date(stats.lastUpdated).toLocaleString()}</span>}
             </div>
             <button
               type="submit"
               disabled={saving}
-              className="group inline-flex items-center gap-2 rounded-full bg-[#5D1F17] px-6 py-2.5 text-xs font-semibold text-white transition-all duration-300 hover:bg-[#4A1812] hover:shadow-lg hover:shadow-[#5D1F17]/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#5D1F17] px-6 py-2.5 text-xs font-semibold text-white transition-all hover:bg-[#4A1812] hover:shadow-lg hover:shadow-[#5D1F17]/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  Saving…
-                </>
+                <><Loader2 className="h-3.5 w-3.5 animate-spin" />Saving…</>
               ) : (
-                <>
-                  <Save className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
-                  Save Settings
-                  <ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </>
+                <><Save className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />Save Settings<ArrowUpRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></>
               )}
             </button>
           </div>
