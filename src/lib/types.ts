@@ -152,6 +152,7 @@ export interface Testimonial {
   id: string;
   author: string;
   role: string | null;
+  location: string | null;
   quote: string;
   avatar: string | null;
   company_logo: string | null;

@@ -7,6 +7,7 @@ interface Testimonial {
   id: string;
   author: string;
   role: string;
+  location?: string;
   quote: string;
   avatar?: string;
   companyLogo?: string;
@@ -128,6 +129,7 @@ function mapDB(t: DBTestimonial): Testimonial {
     id: t.id,
     author: t.author,
     role: t.role ?? "",
+    location: t.location ?? undefined,
     quote: t.quote,
     avatar: t.avatar ?? undefined,
     companyLogo: t.company_logo ?? undefined,
@@ -145,10 +147,25 @@ export function Testimonials() {
       .eq("active", true)
       .order("sort_order")
       .then(({ data, error }) => {
-        if (!error && data && data.length > 0) {
+        if (!error && data && data.length > 0)
           setTestimonials((data as DBTestimonial[]).map(mapDB));
-        }
       });
+
+    const channel = supabase
+      .channel("testimonials-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "testimonials" }, () => {
+        supabase
+          .from("testimonials")
+          .select("*")
+          .eq("active", true)
+          .order("sort_order")
+          .then(({ data, error }) => {
+            if (!error && data) setTestimonials(data.length > 0 ? (data as DBTestimonial[]).map(mapDB) : FALLBACK);
+          });
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const row1 = [...testimonials, ...testimonials];
@@ -242,7 +259,7 @@ function TestimonialCard({ item }: { item: Testimonial }) {
             {item.author}
           </span>
           <span className="text-[11px] text-zinc-500 leading-none">
-            {item.role}
+            {[item.role, item.location].filter(Boolean).join(" · ")}
           </span>
         </div>
       </div>
