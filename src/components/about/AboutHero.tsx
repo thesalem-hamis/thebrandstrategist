@@ -62,8 +62,8 @@ export function AboutHero() {
           transition={{ duration: 0.6 }}
           className="mb-8 mt-10 sm:mb-12 sm:mt-16 lg:mt-20"
         >
-          <h1 className="whitespace-normal text-3xl font-semibold uppercase leading-tight tracking-[-0.02em] text-neutral-900 sm:text-5xl lg:text-[64px]">
-            BIMPE MOHAMMED
+          <h1 className="whitespace-normal text-2xl font-semibold uppercase leading-tight tracking-[-0.02em] text-neutral-900 sm:text-5xl lg:text-[64px]">
+            ADEBIMPE MOHAMMED
           </h1>
         </motion.div>
 
