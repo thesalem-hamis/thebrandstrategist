@@ -141,6 +141,7 @@ export interface Project {
   process: string[];
   outcome: string | null;
   banner_image: string | null;
+  logo_image: string | null;
   link: string | null;
   sort_order: number;
   active: boolean;
