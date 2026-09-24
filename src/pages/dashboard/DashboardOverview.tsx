@@ -113,7 +113,7 @@ export default function DashboardOverview() {
   const cards = [
     {
       label: "Revenue",
-      value: `$${(stats.revenueCents / 100).toFixed(0)}`,
+      value: `₦${(stats.revenueCents / 100).toFixed(0)}`,
       sub: `${stats.paidConsultations} paid sessions`,
       icon: DollarSign,
       accent: "from-emerald-500/15 to-emerald-500/0",
@@ -277,7 +277,7 @@ export default function DashboardOverview() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <span className="hidden sm:inline text-[11px] font-medium text-neutral-500 tabular-nums">
-                      ${(c.amount / 100).toFixed(0)}
+                      ₦{(c.amount / 100).toFixed(0)}
                     </span>
                     <StatusBadge status={c.status} />
                   </div>
@@ -298,7 +298,7 @@ export default function DashboardOverview() {
                 This month
               </p>
               <p className="mt-3 flex items-baseline gap-2 text-3xl font-light tabular-nums">
-                <span>${(stats.revenueCents / 100).toFixed(0)}</span>
+                <span>₦{(stats.revenueCents / 100).toFixed(0)}</span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
                   <TrendingUp className="h-2.5 w-2.5" /> Live
                 </span>
@@ -382,7 +382,7 @@ export default function DashboardOverview() {
                     </div>
                     <p className="mt-0.5 flex items-center gap-1 text-[10px] text-neutral-500">
                       <Clock className="h-2.5 w-2.5" />
-                      ${((o.total_amount ?? 0) / 100).toFixed(0)} · {new Date(o.created_at).toLocaleDateString()}
+                      ₦{((o.total_amount ?? 0) / 100).toFixed(0)} · {new Date(o.created_at).toLocaleDateString()}
                     </p>
                   </li>
                 ))}

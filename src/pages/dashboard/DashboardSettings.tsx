@@ -98,7 +98,7 @@ export default function DashboardSettings() {
       
       const feeValue = parseInt(fee);
       if (isNaN(feeValue) || feeValue < 1) {
-        throw new Error("Consultation fee must be at least $1");
+        throw new Error("Consultation fee must be at least ₦1");
       }
 
       const updates = [
@@ -155,7 +155,7 @@ export default function DashboardSettings() {
     },
     {
       label: "Consultation Fee",
-      value: `$${fee}`,
+      value: `₦${fee}`,
       icon: DollarSign,
       accent: "from-emerald-500/15 to-emerald-500/0",
       iconBg: "bg-emerald-500/10 text-emerald-700",
@@ -303,7 +303,7 @@ export default function DashboardSettings() {
               </label>
               <div className="relative">
                 <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-neutral-400">
-                  $
+                  ₦
                 </span>
                 <input
                   type="number"

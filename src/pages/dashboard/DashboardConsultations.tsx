@@ -144,7 +144,7 @@ export default function DashboardConsultations() {
     },
     {
       label: "Revenue",
-      value: `$${(revenue / 100).toFixed(0)}`,
+      value: `₦${(revenue / 100).toFixed(0)}`,
       icon: Sparkles,
       accent: "from-[#5D1F17]/15 to-[#5D1F17]/0",
       iconBg: "bg-[#5D1F17]/10 text-[#5D1F17]",
@@ -366,7 +366,7 @@ export default function DashboardConsultations() {
                     </td>
                     <td className="px-6 py-4">
                       <span className="font-semibold tabular-nums text-neutral-900">
-                        ${(c.amount / 100).toFixed(0)}
+                        ₦{(c.amount / 100).toFixed(0)}
                       </span>
                       <span className="ml-1 text-[10px] font-medium uppercase text-neutral-400">
                         {c.currency}
