@@ -128,3 +128,36 @@ export interface SiteSettings {
   consultation_fee_usd: string;
   contact_email: string;
 }
+
+export interface Project {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  overview: string | null;
+  year: string | null;
+  focus: string[];
+  process: string[];
+  outcome: string | null;
+  banner_image: string | null;
+  link: string | null;
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Testimonial {
+  id: string;
+  author: string;
+  role: string | null;
+  quote: string;
+  avatar: string | null;
+  company_logo: string | null;
+  bg_class: string | null;
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}

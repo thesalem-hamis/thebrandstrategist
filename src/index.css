@@ -288,6 +288,14 @@ html.lenis body {
   pointer-events: none;
 }
 
+/* ===== Hide scrollbar utility ===== */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* ===== General feel ===== */
 html {
   overflow-x: hidden;

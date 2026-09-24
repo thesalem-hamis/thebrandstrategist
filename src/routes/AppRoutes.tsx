@@ -26,6 +26,8 @@ import DashboardServiceRequests from "@/pages/dashboard/DashboardServiceRequests
 import DashboardBooks from "@/pages/dashboard/DashboardBooks";
 import DashboardInquiries from "@/pages/dashboard/DashboardInquiries";
 import DashboardSettings from "@/pages/dashboard/DashboardSettings";
+import DashboardProjects from "@/pages/dashboard/DashboardProjects";
+import DashboardTestimonials from "@/pages/dashboard/DashboardTestimonials";
 import { Loader2 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 
@@ -68,6 +70,8 @@ export default function AppRoutes() {
           <Route path="orders" element={<DashboardOrders />} />
           <Route path="service-requests" element={<DashboardServiceRequests />} />
           <Route path="books" element={<DashboardBooks />} />
+          <Route path="projects" element={<DashboardProjects />} />
+          <Route path="testimonials" element={<DashboardTestimonials />} />
           <Route path="blog" element={<DashboardBlog />} />
           <Route path="inquiries" element={<DashboardInquiries />} />
           <Route path="settings" element={<DashboardSettings />} />

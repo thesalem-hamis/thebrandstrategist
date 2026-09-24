@@ -16,6 +16,8 @@ import {
   ShoppingBag,
   ClipboardList,
   BookOpen,
+  FolderOpen,
+  MessageSquareQuote,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 
@@ -25,6 +27,8 @@ const NAV_ITEMS = [
   { to: "/dashboard/orders", label: "Orders", icon: ShoppingBag, badge: null },
   { to: "/dashboard/service-requests", label: "Service Requests", icon: ClipboardList, badge: "Leads" },
   { to: "/dashboard/books", label: "Books", icon: BookOpen, badge: null },
+  { to: "/dashboard/projects", label: "Projects", icon: FolderOpen, badge: null },
+  { to: "/dashboard/testimonials", label: "Testimonials", icon: MessageSquareQuote, badge: null },
   { to: "/dashboard/blog", label: "Blog Posts", icon: FileText, badge: null },
   { to: "/dashboard/inquiries", label: "Inquiries", icon: Inbox, badge: "Leads" },
   { to: "/dashboard/settings", label: "Settings", icon: Settings, badge: null },
@@ -45,7 +49,7 @@ export default function DashboardLayout() {
   const SidebarContent = (
     <div className="flex h-full flex-col">
       {/* Brand */}
-      <div className="flex items-center gap-3 px-5 pt-6 pb-8">
+      <div className="flex items-center gap-3 px-5 pt-5 pb-5">
         <div className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-[#5D1F17] to-[#3a120c] text-white shadow-lg shadow-[#5D1F17]/20">
           <Sparkles className="h-4 w-4" />
           <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-[#0c0a09]" />
@@ -57,8 +61,8 @@ export default function DashboardLayout() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 space-y-0.5">
-        <p className="px-3 pb-2 pt-1 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">
+      <nav className="flex-1 overflow-y-auto px-3 space-y-0.5 scrollbar-none">
+        <p className="px-3 pb-1.5 pt-1 text-[9px] font-bold uppercase tracking-[0.22em] text-white/30">
           Workspace
         </p>
         {NAV_ITEMS.map((item) => (
@@ -68,7 +72,7 @@ export default function DashboardLayout() {
             end={item.end}
             onClick={() => setMobileOpen(false)}
             className={({ isActive }) =>
-              `group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13px] font-medium transition-all duration-200 ${
+              `group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200 ${
                 isActive
                   ? "bg-gradient-to-r from-white/10 to-white/[0.04] text-white shadow-inner shadow-black/20 ring-1 ring-white/10"
                   : "text-white/55 hover:bg-white/[0.04] hover:text-white"
@@ -104,7 +108,7 @@ export default function DashboardLayout() {
       </nav>
 
       {/* User card */}
-      <div className="mx-3 mb-4 mt-4 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+      <div className="mx-3 mb-3 mt-2 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
         <div className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-[#5D1F17] to-[#3a120c] text-[11px] font-bold text-white">
             {initials}
