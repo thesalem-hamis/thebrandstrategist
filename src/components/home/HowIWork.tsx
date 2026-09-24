@@ -58,7 +58,7 @@ export function HowIWork() {
         {/* Top Full-Width Two-Line Heading Header */}
         <div className="mb-10 sm:mb-12 md:mb-16">
           <Reveal>
-            <h1 className="font-display text-[clamp(2.25rem,4.5vw,3.75rem)] font-normal tracking-tight text-foreground leading-[1.05]">
+            <h1 className="text-2xl sm:text-3xl lg:text-5xl font-bold tracking-[-0.04em] text-neutral-900 leading-tight text-balance">
               The Process <br />
               <span className="font-serif italic font-normal text-muted-foreground text-[0.9em]">
                 Behind The Work<span className="text-[#5D1F17] font-serif not-italic">.</span>

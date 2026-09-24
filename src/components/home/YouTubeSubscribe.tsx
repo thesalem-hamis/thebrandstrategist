@@ -1,71 +1,74 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowUpRight, Video } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { GridPattern } from "@/components/ui/grid-pattern";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "./Reveal";
 
+const BUTTON_COLOR = "#5D1F17";
+
 export function YouTubeSubscribe() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "-100px" });
+
+  const videoBaseUrl =
+    "https://www.youtube.com/embed/jctWR-t0k24?si=mx-BkwMhzIIitUr7";
+  const videoSrc = isInView
+    ? `${videoBaseUrl}&autoplay=1&mute=1`
+    : videoBaseUrl;
+
   return (
-    <section className="bg-black text-white py-16 sm:py-24 md:py-32 relative overflow-hidden w-full">
-      <div className="absolute inset-0 w-full h-full pointer-events-none overflow-hidden">
-        <GridPattern
-          squares={[
-            [4, 4],
-            [5, 1],
-            [8, 2],
-            [5, 3],
-            [5, 5],
-            [10, 10],
-            [12, 15],
-            [15, 10],
-            [10, 15],
-          ]}
-          className={cn(
-            "[mask-image:radial-gradient(600px_circle_at_center,white,transparent)]",
-            "absolute inset-0 w-full h-full fill-white/5 stroke-white/5 pointer-events-none"
-          )}
-        />
-      </div>
+    <section className="relative w-full bg-white text-neutral-900 py-16 sm:py-24 lg:py-32 overflow-hidden">
+      {/* Top Accent Line */}
+      <div
+        className="absolute top-0 left-0 w-full h-[2px]"
+        style={{ backgroundColor: BUTTON_COLOR }}
+      />
 
-      <div className="container-edit px-6 sm:px-10 md:px-16 relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+      <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-8 lg:px-12">
         <Reveal>
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Video className="h-6 w-6 text-white" />
-            <span className="text-xs font-bold uppercase tracking-widest text-white/70">
-              YouTube Channel
-            </span>
-          </div>
+          <div ref={containerRef} className="relative w-full">
+            {/* ================= HEADER ================= */}
+            <div className="max-w-2xl mx-auto text-center mb-10 sm:mb-14">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-semibold leading-[1.1] tracking-[-0.03em] text-neutral-950">
+                Connect with me on YouTube.
+              </h1>
+              <p className="mt-4 text-sm sm:text-base text-neutral-500 max-w-lg mx-auto">
+                Practical insights on brand strategy, storytelling, and building
+                authentic brands that last.
+              </p>
+            </div>
 
-          <h2 className="font-display text-[clamp(1.75rem,3.5vw,2.75rem)] font-normal tracking-normal text-white leading-[1.2] text-balance">
-            Subscribe on YouTube
-            <br />
-            <span className="font-serif italic font-normal text-white/90">
-              for brand insights
-            </span>
-          </h2>
+            {/* ================= VIDEO FRAME ================= */}
+            <div className="relative w-full max-w-4xl mx-auto">
+              <div className="relative w-full aspect-video rounded-2xl sm:rounded-3xl lg:rounded-[2rem] overflow-hidden shadow-2xl border border-black/10 bg-black z-10 transition-transform duration-500 hover:scale-[1.005]">
+                <iframe
+                  src={videoSrc}
+                  title="YouTube video player"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              </div>
+            </div>
 
-          <p className="mt-5 text-white/70 max-w-md mx-auto text-xs sm:text-sm leading-relaxed font-light">
-            Join the @itsbnm community for weekly brand strategy tips,
-            behind-the-scenes breakdowns, and practical frameworks you
-            can apply right away.
-          </p>
-
-          <div className="mt-7 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <motion.a
-              href="https://www.youtube.com/@itsbnm?sub_confirmation=1"
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#FF0000] text-white font-semibold text-xs tracking-wider uppercase transition-colors hover:bg-[#CC0000]"
-            >
-              <Video className="w-4 h-4" />
-              <span>Subscribe Now</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            </motion.a>
+            {/* ================= SUBSCRIBE BUTTON ================= */}
+            <div className="mt-10 sm:mt-14 flex justify-center relative z-10">
+              <motion.a
+                href="https://www.youtube.com/@itsbnm?sub_confirmation=1"
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                className="group inline-flex items-center justify-center gap-3 px-9 py-4 rounded-full text-white font-semibold text-sm sm:text-base tracking-wide shadow-lg transition-all duration-300 hover:shadow-xl hover:opacity-95"
+                style={{ backgroundColor: BUTTON_COLOR }}
+              >
+                <span>Subscribe On Youtube</span>
+                <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </motion.a>
+            </div>
           </div>
         </Reveal>
       </div>

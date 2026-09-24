@@ -296,9 +296,9 @@ export default function ServicesPage() {
           transition={{ duration: 0.6 }}
           className="mb-4"
         >
-          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-bold tracking-tight uppercase leading-none text-neutral-900">
-            STRATEGIC{" "}
-            <span className="font-serif italic text-[#5D1F17]">
+          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-semibold tracking-[-0.04em] font-sans leading-[0.95] text-neutral-900">
+            STRATEGIC{" "}  
+            <span className="font-sans font-semibold text-[#5D1F17]">
               SOLUTIONS
             </span>
           </h1>

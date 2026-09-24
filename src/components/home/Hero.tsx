@@ -187,15 +187,15 @@ export function Hero() {
             className="flex flex-col justify-between h-full md:h-auto md:col-span-5 md:pb-2 md:-translate-y-4 lg:-translate-y-8"
           >
             <div className="translate-y-14 sm:translate-y-6 md:translate-y-0">
-              <p className="text-[0.65rem] sm:text-xs font-bold uppercase tracking-[0.25em] text-white/80">
+              <p className="text-[0.65rem] sm:text-xs font-bold font-sans uppercase tracking-[0.25em] text-white/80">
                 Brand Strategist and Consultant
               </p>
-              <h1 className="mt-1 md:mt-2 text-2xl font-normal uppercase leading-[0.95] tracking-tight text-white sm:text-3xl md:text-[3rem] lg:text-[3.25rem]">
+              <h1 className="mt-1 md:mt-2 text-2xl font-semibold font-sans uppercase leading-[0.95] tracking-tight text-white sm:text-3xl md:text-[3rem] lg:text-[3.25rem]">
                 I turn business <br />
                 vision into <br />
                 brand
               </h1>
-              <p className="font-sans font-light italic text-3xl leading-tight text-white/90 sm:text-3xl md:text-[3.25rem] tracking-tight">
+              <p className="font-sans font-normal italic text-3xl leading-tight text-white/90 sm:text-3xl md:text-[3.25rem] tracking-tight">
                 Advantage.
               </p>
             </div>

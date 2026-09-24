@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, ArrowUpRight, BookOpen, Mail, User, ExternalLink } from "lucide-react";
+import { ShoppingCart, ArrowDownRight, BookOpen, Mail, User, ExternalLink } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import type { BookProduct } from "@/lib/types";
+
 
 export default function BooksPage() {
   const [products, setProducts] = useState<BookProduct[]>([]);
@@ -203,13 +204,13 @@ export default function BooksPage() {
             to="/"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#5D1F17] bg-white text-[#5D1F17] hover:border-neutral-900 hover:text-neutral-900 text-xs font-semibold tracking-wider uppercase transition-all duration-200 shadow hover:shadow-md group/btn mb-8"
           >
-            <ArrowUpRight className="w-3.5 h-3.5 rotate-180 transition-transform duration-300 group-hover/btn:-translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+            <ArrowDownRight className="w-3.5 h-3.5 rotate-180 transition-transform duration-300 group-hover/btn:-translate-x-0.5 group-hover/btn:-translate-y-0.5" />
             <span>GO BACK</span>
           </Link>
 
-          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-bold tracking-tight uppercase leading-none text-neutral-900">
+          <h1 className="text-2xl sm:text-5xl lg:text-[68px] font-semibold tracking-[-0.04em] font-sans leading-[0.95] text-neutral-900">
             THE{" "}
-            <span className="font-serif italic text-[#5D1F17]">
+            <span className="font-sans font-semibold text-[#5D1F17]">
               COLLECTION
             </span>
           </h1>
@@ -240,12 +241,12 @@ export default function BooksPage() {
                 key={i}
                 className="lg:col-span-6 xl:col-span-6"
               >
-                <div className="group grid grid-cols-1 md:grid-cols-12 gap-8 border border-zinc-200 rounded-2xl overflow-hidden shadow-sm">
-                  <div className="md:col-span-4 bg-neutral-200 flex items-center justify-center p-6">
+                <div className="flex flex-col border border-zinc-200 rounded-2xl overflow-hidden shadow-sm">
+                  <div className="bg-neutral-200 flex items-center justify-center p-6">
                     <div className="h-[280px] w-full max-w-[180px] rounded-lg bg-neutral-300" />
                   </div>
 
-                  <div className="md:col-span-8 p-6 sm:p-10 flex flex-col">
+                  <div className="p-6 sm:p-10 flex flex-col">
                     <div className="mb-4 h-3 w-24 rounded bg-neutral-300" />
                     <div className="mb-2 h-5 sm:h-6 w-48 rounded bg-neutral-300 uppercase" />
                     <div className="mb-3 h-3 w-20 rounded bg-neutral-300" />
@@ -277,8 +278,8 @@ export default function BooksPage() {
                 key={product.id}
                 className="lg:col-span-6 xl:col-span-6"
               >
-                <div className="group grid grid-cols-1 md:grid-cols-12 gap-8 border border-zinc-200 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
-                  <div className="md:col-span-4 bg-neutral-100 flex items-center justify-center p-6">
+                <div className="group flex flex-col border border-zinc-200 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
+                  <div className="bg-neutral-100 flex items-center justify-center p-6">
                     {product.image_url ? (
                       <img
                         src={product.image_url}
@@ -292,7 +293,7 @@ export default function BooksPage() {
                     )}
                   </div>
 
-                  <div className="md:col-span-8 p-6 sm:p-10 flex flex-col">
+                  <div className="p-6 sm:p-10 flex flex-col">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 font-mono mb-4">
                       Digital Book
                     </p>
@@ -423,3 +424,6 @@ export default function BooksPage() {
     </div>
   );
 }
+
+
+

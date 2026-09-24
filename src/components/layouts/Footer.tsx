@@ -3,6 +3,7 @@ import {
   FaWhatsapp,
   FaBehance,
   FaInstagram,
+  FaYoutube,
 } from "react-icons/fa6";
 
 import logo from "@/assets/logo.svg";
@@ -15,13 +16,6 @@ const COMPANY_LINKS = [
   { label: "Blog", href: "/blog" },
   // { label: "Contact", href: "/contact" },
 ];
-
-// const RESOURCE_LINKS = [
-//   { label: "Brand Strategy", href: "#services" },
-//   { label: "Social Media", href: "#services" },
-//   { label: "Content Strategy", href: "#services" },
-//   { label: "Case Studies", href: "#portfolio" },
-// ];
 
 const SOCIAL_LINKS = [
   {
@@ -43,6 +37,11 @@ const SOCIAL_LINKS = [
     icon: FaBehance,
     href: "https://www.behance.net/adebimpmohamme",
     label: "Behance",
+  },
+  {
+    icon: FaYoutube,
+    href: "https://www.youtube.com",
+    label: "YouTube",
   },
 ];
 
@@ -304,7 +303,7 @@ export function Footer() {
                 hover:text-[#6B1F3A]
               "
             >
-              hello@example.com
+              bnmbrandhouse@gmail.com
             </a>
 
           </div>
