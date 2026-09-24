@@ -136,7 +136,7 @@ export default function DashboardSettings() {
     },
     {
       label: "Consultation Fee",
-      value: `₦${fee}`,
+      value: `$${fee}`,
       icon: DollarSign,
       accent: "from-emerald-500/15 to-emerald-500/0",
       iconBg: "bg-emerald-500/10 text-emerald-700",
@@ -247,7 +247,7 @@ export default function DashboardSettings() {
                 <DollarSign className="h-3.5 w-3.5" />Consultation Fee (USD)
               </label>
               <div className="relative">
-                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-neutral-400">₦</span>
+                <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-neutral-400">$</span>
                 <input
                   type="number"
                   min="1"
