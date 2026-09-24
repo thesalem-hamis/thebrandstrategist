@@ -464,9 +464,10 @@ export default function ConsultationPage() {
                   return <div key={index} />;
                 }
 
-                const disabled = isPast(day) || isBlocked(day);
-                const selected =
-                  selectedDay === day;
+                const blocked = isBlocked(day);
+                const past = isPast(day);
+                const disabled = past || blocked;
+                const selected = selectedDay === day;
 
                 return (
                   <div
@@ -482,7 +483,9 @@ export default function ConsultationPage() {
                         setPaymentError(null);
                       }}
                       className={`relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-xs sm:text-sm font-medium rounded-full transition-all duration-300 ${
-                        disabled
+                        blocked
+                          ? "bg-neutral-100 text-neutral-300 cursor-not-allowed"
+                          : past
                           ? "text-neutral-300 cursor-not-allowed"
                           : selected
                           ? "bg-[#5D1F17] text-white shadow-sm"
@@ -491,10 +494,16 @@ export default function ConsultationPage() {
                     >
                       {day}
 
-                      {isToday(day) &&
-                        !selected && (
-                          <span className="absolute bottom-1 w-1 h-1 rounded-full bg-[#5D1F17]" />
-                        )}
+                      {blocked && (
+                        <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-[3px]">
+                          <span className="w-[3px] h-[3px] rounded-full bg-neutral-300" />
+                          <span className="w-[3px] h-[3px] rounded-full bg-neutral-300" />
+                        </span>
+                      )}
+
+                      {isToday(day) && !selected && !blocked && (
+                        <span className="absolute bottom-1 w-1 h-1 rounded-full bg-[#5D1F17]" />
+                      )}
                     </button>
                   </div>
                 );

@@ -304,14 +304,20 @@ export default function DashboardSettings() {
               </div>
               {blockedDates.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {blockedDates.map((date) => (
-                    <span key={date} className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[11px] font-semibold text-red-700">
-                      {new Date(date + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
-                      <button type="button" onClick={() => removeBlockedDate(date)} className="hover:text-red-900">
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ))}
+                  {blockedDates.map((date) => {
+                    const d = new Date(date + "T00:00:00");
+                    const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
+                    const formatted = d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                    return (
+                      <span key={date} className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-[11px] font-semibold text-red-700">
+                        <span className="text-red-400 font-normal">{weekday}</span>
+                        {formatted}
+                        <button type="button" onClick={() => removeBlockedDate(date)} className="ml-0.5 hover:text-red-900 transition-colors">
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    );
+                  })}
                 </div>
               )}
               <div className="mt-2 flex items-start gap-2 rounded-lg bg-red-50/50 p-3">

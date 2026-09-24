@@ -1,273 +1,1065 @@
-// ============================================================
-// Edge Function: send-confirmation-email
-// Single entry point for all customer-facing emails.
-//
-// Required secrets (supabase secrets set):
-//   RESEND_API_KEY
-//   EMAIL_FROM   e.g. "The Brand Strategist <bookings@yourdomain.com>"
-//
-// Endpoint: https://<project>.supabase.co/functions/v1/send-confirmation-email
-// ============================================================
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import nodemailer from "npm:nodemailer";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
-const EMAIL_FROM = Deno.env.get("EMAIL_FROM") ?? "onboarding@resend.dev";
+/* =========================================================
+   CORS
+   ========================================================= */
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-type EmailTemplate = "consultation" | "service_request" | "order";
+/* =========================================================
+   ENVIRONMENT VARIABLES
+   ========================================================= */
 
-interface ConsultationRow {
-  client_name: string;
-  client_email: string;
-  session_date: string;
-  session_time: string;
-  amount: number;
-  currency: string;
-  reference: string;
-  service_name?: string;
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get(
+  "SUPABASE_SERVICE_ROLE_KEY"
+)!;
+
+const GMAIL_USER = Deno.env.get("GMAIL_USER")!;
+const GMAIL_APP_PASSWORD = Deno.env.get("GMAIL_APP_PASSWORD")!;
+
+/* =========================================================
+   SUPABASE CLIENT
+   ========================================================= */
+
+const supabase = createClient(
+  SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE_KEY
+);
+
+/* =========================================================
+   GMAIL / NODEMAILER
+   ========================================================= */
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: GMAIL_USER,
+    pass: GMAIL_APP_PASSWORD,
+  },
+});
+
+/* =========================================================
+   TYPES
+   ========================================================= */
+
+type EmailTemplate =
+  | "consultation"
+  | "service_request"
+  | "book_order"
+  | "registration";
+
+interface EmailData {
+  [key: string]: any;
 }
 
-interface ServiceRequestRow {
-  client_name: string;
-  client_email: string;
-  service_name: string;
-  request_status: string;
-  created_at: string;
-}
+/* =========================================================
+   HELPERS
+   ========================================================= */
 
-interface OrderRow {
-  client_name: string;
-  client_email: string;
-  book_title: string;
-  quantity: number;
-  total_amount: number;
-  currency: string;
-  order_number: string;
-  pdf_url?: string | null;
-}
-
-const BRAND_COLOR = "#5D1F17";
-
-const wrapHtml = (inner: string) => `<!DOCTYPE html>
-<html>
-  <body style="margin:0;padding:0;background:#f5f4f2;font-family:Georgia,'Times New Roman',serif;">
-    <div style="max-width:560px;margin:0 auto;padding:40px 24px;">
-      <div style="background:#ffffff;border:1px solid #e5e5e5;border-radius:8px;overflow:hidden;">
-        <div style="background:${BRAND_COLOR};padding:28px 32px;">
-          <p style="margin:0;color:#ffffff;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-family:Arial,sans-serif;">The Brand Strategist</p>
-        </div>
-        <div style="padding:32px;">
-          ${inner}
-        </div>
-        <div style="padding:20px 32px;background:#faf9f7;border-top:1px solid #eee;">
-          <p style="margin:0;color:#aaa;font-size:11px;font-family:Arial,sans-serif;">© The Brand Strategist — Bimpe Mohammed</p>
-        </div>
-      </div>
-    </div>
-  </body>
-</html>`;
-
-function consultationEmail(c: ConsultationRow, zoomLink: string): string {
-  const amountDisplay = (c.amount / 100).toFixed(0);
-  const joinBlock = zoomLink
-    ? `<div style="background:#faf9f7;border:1px solid #e5e5e5;border-radius:6px;padding:20px;text-align:center;">
-         <p style="margin:0 0 14px;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.15em;font-family:Arial,sans-serif;">Your Zoom Link</p>
-         <a href="${zoomLink}" style="display:inline-block;background:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:999px;font-size:13px;font-family:Arial,sans-serif;font-weight:bold;">Join via Zoom</a>
-         <p style="margin:14px 0 0;color:#777;font-size:11px;word-break:break-all;font-family:Arial,sans-serif;">${zoomLink}</p>
-       </div>`
-    : `<div style="background:#fff3cd;border:1px solid #ffe69c;border-radius:6px;padding:16px;text-align:center;">
-         <p style="margin:0;color:#664d03;font-size:13px;font-family:Arial,sans-serif;">The Zoom link will be sent to you shortly. If you don't receive it, please reply to this email.</p>
-       </div>`;
-  return wrapHtml(`
-    <p style="margin:0 0 16px;color:#333;font-size:15px;line-height:1.6;">Dear ${c.client_name},</p>
-    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.7;">
-      Thank you — your payment of <strong>$${amountDisplay} ${c.currency}</strong> was received successfully.
-      Your 1-on-1 strategy consultation${c.service_name ? ` (${c.service_name})` : ""} is confirmed.
-    </p>
-    <table style="width:100%;border-collapse:collapse;margin:0 0 24px;font-family:Arial,sans-serif;">
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Date</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">${c.session_date}</td></tr>
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Time</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">${c.session_time}</td></tr>
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Reference</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">${c.reference}</td></tr>
-    </table>
-    ${joinBlock}
-    <p style="margin:24px 0 0;color:#888;font-size:12px;line-height:1.6;font-family:Arial,sans-serif;">
-      Please keep this email safe. If you have any questions, simply reply to this message.
-    </p>
-  `);
-}
-
-function serviceRequestEmail(r: ServiceRequestRow): string {
-  return wrapHtml(`
-    <p style="margin:0 0 16px;color:#333;font-size:15px;line-height:1.6;">Dear ${r.client_name},</p>
-    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.7;">
-      Thank you — we have received your request for <strong>${r.service_name}</strong>.
-      Our team has reviewed your submission and will reach out to you at <strong>${r.client_email}</strong> within 2 business days.
-    </p>
-    <table style="width:100%;border-collapse:collapse;margin:0 0 24px;font-family:Arial,sans-serif;">
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Submitted</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">${new Date(r.created_at).toLocaleDateString()}</td></tr>
-    </table>
-    <div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:6px;padding:16px;">
-      <p style="margin:0;color:#065f46;font-size:13px;font-family:Arial,sans-serif;">
-        💡 What happens next: Bimpe will review your goals and reply with tailored next steps and a proposal.
-      </p>
-    </div>
-  `);
-}
-
-function orderEmail(o: OrderRow): string {
-  const qty = String(o.quantity);
-  const unit = (o.total_amount / o.quantity / 100).toFixed(2);
-
-  const downloadBlock = o.pdf_url
-    ? `<div style="background:#faf9f7;border:1px solid #e5e5e5;border-radius:6px;padding:20px;text-align:center;margin:0 0 24px;">
-         <p style="margin:0 0 12px;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.15em;font-family:Arial,sans-serif;">Download Your Book</p>
-         <a href="${o.pdf_url}" style="display:inline-block;background:${BRAND_COLOR};color:#ffffff;text-decoration:none;padding:12px 28px;border-radius:999px;font-size:13px;font-family:Arial,sans-serif;font-weight:bold;">Download PDF</a>
-         <p style="margin:12px 0 0;color:#777;font-size:11px;font-family:Arial,sans-serif;">This link is valid for 60 minutes.</p>
-       </div>`
-    : `<div style="background:#fff3cd;border:1px solid #ffe69c;border-radius:6px;padding:16px;text-align:center;">
-         <p style="margin:0;color:#664d03;font-size:13px;font-family:Arial,sans-serif;">Your order is being processed and will ship in 1–3 business days. We'll email you again once your package is on the way.</p>
-       </div>`;
-
-  return wrapHtml(`
-    <p style="margin:0 0 16px;color:#333;font-size:15px;line-height:1.6;">Dear ${o.client_name},</p>
-    <p style="margin:0 0 24px;color:#555;font-size:14px;line-height:1.7;">
-      Thank you — your payment of <strong>$${(o.total_amount / 100).toFixed(0)} ${o.currency}</strong> was received successfully.
-      Your order for <strong>${o.book_title}</strong> is confirmed.
-    </p>
-    <table style="width:100%;border-collapse:collapse;margin:0 0 24px;font-family:Arial,sans-serif;">
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Order #</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">${o.order_number}</td></tr>
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Item</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">${o.book_title} x${qty}</td></tr>
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Unit price</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">$${unit} ${o.currency}</td></tr>
-      <tr><td style="padding:10px 0;border-bottom:1px solid #eee;color:#999;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;">Total</td><td style="padding:10px 0;border-bottom:1px solid #eee;color:#222;font-size:13px;text-align:right;">$${(o.total_amount / 100).toFixed(0)} ${o.currency}</td></tr>
-    </table>
-    ${downloadBlock}
-  `);
-}
-
-async function getSetting(supabase: ReturnType<typeof createClient>, key: string): Promise<string> {
-  const { data } = await supabase.from("site_settings").select("value").eq("key", key).maybeSingle();
-  return data?.value ?? "";
-}
-
-async function getClientIp(req: Request): Promise<string> {
-  return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    ""
-  );
-}
-
-Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+function escapeHtml(value: any): string {
+  if (value === null || value === undefined) {
+    return "";
   }
 
-  let body: any;
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatDate(date: any): string {
+  if (!date) return "";
+
   try {
-    body = await req.json();
+    return new Date(date).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return String(date);
   }
+}
 
-  const { template, data: payload } = body;
-  if (!template || !payload) {
-    return new Response(JSON.stringify({ error: "template and data are required" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+function formatTime(date: any): string {
+  if (!date) return "";
+
+  try {
+    return new Date(date).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
     });
+  } catch {
+    return String(date);
   }
+}
 
-  if (!RESEND_API_KEY) {
-    return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+/* =========================================================
+   BASE EMAIL TEMPLATE
+   ========================================================= */
 
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-  );
+function baseEmailTemplate(
+  content: string,
+  preheader = ""
+): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
 
-  let html: string;
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
-  if (template === "consultation") {
-    const zoomLink = await getSetting(supabase, "zoom_link");
-    html = consultationEmail(payload as ConsultationRow, zoomLink);
-  } else if (template === "service_request") {
-    html = serviceRequestEmail(payload as ServiceRequestRow);
-  } else if (template === "order") {
-    html = orderEmail(payload as OrderRow);
-  } else {
-    return new Response(JSON.stringify({ error: "Unknown template" }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  <meta name="color-scheme" content="light" />
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: EMAIL_FROM,
-      to: [payload.client_email],
-      subject:
-        template === "consultation"
-          ? `Your Session is Confirmed — ${payload.session_date} at ${payload.session_time}`
-          : template === "service_request"
-            ? `We received your request for ${payload.service_name}`
-            : `Order ${payload.order_number} confirmed`,
-      html,
-    }),
-  });
+  <title>The Brand Strategist</title>
 
-  const ip = await getClientIp(req);
-
-  if (!res.ok) {
-    const errText = await res.text();
-    console.error("Resend error:", errText);
-    // Still persist email tracking even on failure if caller asked
-    if (payload._tracking) {
-      await supabase.from("email_log").insert({
-        reference_id: payload._tracking.id,
-        reference_type: payload._tracking.type,
-        to_email: payload.client_email,
-        status: "failed",
-        provider_error: errText.slice(0, 500),
-        client_ip: ip,
-      });
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f7f4f2;
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+      color: #302522;
     }
-    return new Response(JSON.stringify({ success: false, error: errText }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+
+    table {
+      border-collapse: collapse;
+    }
+
+    .wrapper {
+      width: 100%;
+      background-color: #f7f4f2;
+      padding: 40px 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    .header {
+      background-color: #5D1F17;
+      padding: 30px 25px;
+      text-align: center;
+    }
+
+    .brand {
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin: 0;
+    }
+
+    .content {
+      padding: 40px 35px;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 25px;
+      color: #5D1F17;
+      font-size: 28px;
+      line-height: 1.25;
+    }
+
+    h2 {
+      color: #5D1F17;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.75;
+      margin: 0 0 18px;
+      color: #443a37;
+    }
+
+    .highlight {
+      color: #5D1F17;
+      font-weight: 700;
+    }
+
+    .card {
+      background-color: #faf7f5;
+      border: 1px solid #eadfdb;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 25px 0;
+    }
+
+    .button {
+      display: inline-block;
+      background-color: #5D1F17;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .footer {
+      border-top: 1px solid #eee5e2;
+      padding: 25px 30px;
+      text-align: center;
+      background-color: #fcfaf9;
+    }
+
+    .footer p {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #8a7d78;
+      margin: 0;
+    }
+
+    a {
+      color: #5D1F17;
+    }
+
+    @media only screen and (max-width: 600px) {
+      .wrapper {
+        padding: 20px 10px;
+      }
+
+      .content {
+        padding: 30px 22px;
+      }
+
+      .header {
+        padding: 25px 20px;
+      }
+
+      .brand {
+        font-size: 21px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 14px;
+      }
+
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Preheader -->
+  <div
+    style="
+      display:none;
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      color:transparent;
+    "
+  >
+    ${escapeHtml(preheader)}
+  </div>
+
+  <table
+    role="presentation"
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    border="0"
+  >
+    <tr>
+      <td class="wrapper">
+
+        <table
+          role="presentation"
+          class="container"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          align="center"
+        >
+
+          <!-- HEADER -->
+          <tr>
+            <td class="header">
+              <p class="brand">
+                Adebimpe Mohammed
+              </p>
+            </td>
+          </tr>
+
+          <!-- CONTENT -->
+          <tr>
+            <td class="content">
+              ${content}
+            </td>
+          </tr>
+
+          <!-- FOOTER -->
+          <tr>
+            <td class="footer">
+              <p>
+                This email was sent from
+                The Brand Strategist.
+              </p>
+
+              <p style="margin-top:6px;">
+                Please do not reply to this automated email.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+`;
+}
+
+/* =========================================================
+   REGISTRATION EMAIL
+   ========================================================= */
+
+function registrationEmail(
+  data: Record<string, any>
+) {
+  const email =
+    data.email ||
+    data.client_email ||
+    "";
+
+  const firstName =
+    data.first_name ||
+    data.firstName ||
+    "";
+
+  const telegramLink =
+    "https://t.me/+rjyWoEWqv2gzZmQ8";
+
+  const participantName =
+    firstName.trim() || "there";
+
+  const content = `
+    <h1>
+      Registration Confirmed
+    </h1>
+
+    <p>
+      Hello
+      <span class="highlight">
+        ${escapeHtml(participantName)}
+      </span>,
+    </p>
+
+    <p>
+      Thank you for registering your interest in
+      <strong>Brand Conversations with BNM</strong>.
+      I’m looking forward to having you with us this Sunday,
+      <strong>27 September</strong>.
+    </p>
+
+    <p>
+      I’ve created a Telegram group to bring everyone together
+      ahead of the event. It’s where we’ll share the confirmed
+      joining details, reminders and any updates. You’ll also
+      be able to introduce yourself and share a question you’d
+      like us to consider.
+    </p>
+
+    <div class="card">
+
+      <h2 style="margin-top:0;">
+        Join the Telegram Group
+      </h2>
+
+      <p>
+        Please join the group here:
+      </p>
+
+      <div
+        style="
+          text-align:center;
+          margin:25px 0 10px;
+        "
+      >
+        <a
+          href="${telegramLink}"
+          class="button"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Join the Telegram Group
+        </a>
+      </div>
+
+      <p
+        style="
+          margin-top:20px;
+          font-size:13px;
+          color:#786c68;
+        "
+      >
+        If the button above doesn't work,
+        you can also use this link:
+      </p>
+
+      <p
+        style="
+          font-size:13px;
+          word-break:break-all;
+        "
+      >
+        <a
+          href="${telegramLink}"
+          target="_blank"
+          rel="noopener noreferrer"
+          style="color:#5D1F17;"
+        >
+          ${telegramLink}
+        </a>
+      </p>
+
+    </div>
+
+    <p>
+      Once you’re in, take a look at the pinned message for the
+      latest event information. You’re welcome to introduce
+      yourself, but there’s no pressure to do so.
+    </p>
+
+    <p>
+      I’ll see you there.
+    </p>
+
+    <p>
+      Warmly,
+    </p>
+
+    <p>
+      <strong>Adebimpe Mohammed</strong><br />
+      Global Brand Strategist / Advisor
+    </p>
+  `;
+
+  return {
+    to: email,
+
+    subject:
+      "Brand Conversations with BNM — Registration Confirmed",
+
+    html: baseEmailTemplate(
+      content,
+      "Your registration for Brand Conversations with BNM is confirmed. We look forward to having you with us on Sunday, 27 September."
+    ),
+  };
+}
+
+/* =========================================================
+   CONSULTATION EMAIL
+   ========================================================= */
+
+function consultationEmail(
+  data: Record<string, any>
+) {
+  const email =
+    data.email ||
+    data.client_email ||
+    "";
+
+  const firstName =
+    data.first_name ||
+    data.firstName ||
+    "there";
+
+  const consultationDate =
+    data.date ||
+    data.consultation_date ||
+    data.scheduled_at;
+
+  const zoomLink =
+    data.zoom_link ||
+    data.zoomLink ||
+    "";
+
+  const content = `
+    <h1>
+      Consultation Confirmed
+    </h1>
+
+    <p>
+      Hello
+      <span class="highlight">
+        ${escapeHtml(firstName)}
+      </span>,
+    </p>
+
+    <p>
+      Thank you for booking a
+      <strong>1-on-1 Consultation with Bimpe Mohammed</strong>.
+      Your consultation has been confirmed.
+    </p>
+
+    ${
+      consultationDate
+        ? `
+          <div class="card">
+
+            <h2 style="margin-top:0;">
+              Consultation Details
+            </h2>
+
+            <p>
+              <strong>Date:</strong><br />
+              ${escapeHtml(
+                formatDate(consultationDate)
+              )}
+            </p>
+
+            <p>
+              <strong>Time:</strong><br />
+              ${escapeHtml(
+                formatTime(consultationDate)
+              )}
+            </p>
+
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      zoomLink
+        ? `
+          <div
+            style="
+              text-align:center;
+              margin:30px 0;
+            "
+          >
+            <a
+              href="${escapeHtml(zoomLink)}"
+              class="button"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Join Consultation
+            </a>
+          </div>
+        `
+        : ""
+    }
+
+    <p>
+      Please keep this email for your records.
+    </p>
+
+    <p>
+      Warmly,
+    </p>
+
+    <p>
+      <strong>Adebimpe Mohammed</strong><br />
+      Global Brand Strategist / Advisor
+    </p>
+  `;
+
+  return {
+    to: email,
+
+    subject:
+      "Your 1-on-1 Consultation is Confirmed",
+
+    html: baseEmailTemplate(
+      content,
+      "Your 1-on-1 consultation with Bimpe Mohammed has been confirmed."
+    ),
+  };
+}
+
+/* =========================================================
+   SERVICE REQUEST EMAIL
+   ========================================================= */
+
+function serviceRequestEmail(
+  data: Record<string, any>
+) {
+  const email =
+    data.email ||
+    data.client_email ||
+    "";
+
+  const firstName =
+    data.first_name ||
+    data.firstName ||
+    "there";
+
+  const serviceName =
+    data.service_name ||
+    data.service ||
+    "your requested service";
+
+  const content = `
+    <h1>
+      Service Request Received
+    </h1>
+
+    <p>
+      Hello
+      <span class="highlight">
+        ${escapeHtml(firstName)}
+      </span>,
+    </p>
+
+    <p>
+      Thank you for your interest in
+      <strong>
+        ${escapeHtml(serviceName)}
+      </strong>.
+    </p>
+
+    <p>
+      We have received your request and will review the
+      information you submitted. You’ll be contacted with the
+      next steps.
+    </p>
+
+    <div class="card">
+
+      <h2 style="margin-top:0;">
+        Request Details
+      </h2>
+
+      <p>
+        <strong>Service:</strong><br />
+        ${escapeHtml(serviceName)}
+      </p>
+
+    </div>
+
+    <p>
+      Thank you for choosing The Brand Strategist.
+    </p>
+
+    <p>
+      Warmly,
+    </p>
+
+    <p>
+      <strong>Adebimpe Mohammed</strong><br />
+      Global Brand Strategist / Advisor
+    </p>
+  `;
+
+  return {
+    to: email,
+
+    subject:
+      "Your Service Request Has Been Received",
+
+    html: baseEmailTemplate(
+      content,
+      "We have received your service request and will be in touch with the next steps."
+    ),
+  };
+}
+
+/* =========================================================
+   BOOK ORDER EMAIL
+   ========================================================= */
+
+async function bookOrderEmail(
+  data: Record<string, any>
+) {
+  const email =
+    data.email ||
+    data.client_email ||
+    "";
+
+  const firstName =
+    data.first_name ||
+    data.firstName ||
+    "there";
+
+  const bookTitle =
+    data.book_title ||
+    data.bookTitle ||
+    "The Brand Strategist";
+
+  const orderReference =
+    data.reference ||
+    data.order_reference ||
+    "";
+
+  const content = `
+    <h1>
+      Book Order Confirmed
+    </h1>
+
+    <p>
+      Hello
+      <span class="highlight">
+        ${escapeHtml(firstName)}
+      </span>,
+    </p>
+
+    <p>
+      Thank you for your purchase of
+      <strong>
+        ${escapeHtml(bookTitle)}
+      </strong>.
+    </p>
+
+    <p>
+      Your payment has been successfully verified and your
+      order has been confirmed.
+    </p>
+
+    ${
+      orderReference
+        ? `
+          <div class="card">
+
+            <h2 style="margin-top:0;">
+              Order Details
+            </h2>
+
+            <p>
+              <strong>Book:</strong><br />
+              ${escapeHtml(bookTitle)}
+            </p>
+
+            <p>
+              <strong>Reference:</strong><br />
+              ${escapeHtml(orderReference)}
+            </p>
+
+          </div>
+        `
+        : ""
+    }
+
+    <p>
+      Your book file is attached to this email where available.
+    </p>
+
+    <p>
+      Thank you for your purchase.
+    </p>
+
+    <p>
+      Warmly,
+    </p>
+
+    <p>
+      <strong>Adebimpe Mohammed</strong><br />
+      Global Brand Strategist / Advisor
+    </p>
+  `;
+
+  const attachments: any[] = [];
+
+  /*
+   * Try to get the PDF from the book-files bucket.
+   *
+   * The function checks common file names based on the
+   * information provided in the request.
+   */
+
+  const filePath =
+    data.file_path ||
+    data.filePath ||
+    data.book_file_path ||
+    data.bookFilePath ||
+    "";
+
+  if (filePath) {
+    try {
+      const { data: fileData, error } =
+        await supabase.storage
+          .from("book-files")
+          .download(filePath);
+
+      if (!error && fileData) {
+        const arrayBuffer =
+          await fileData.arrayBuffer();
+
+        attachments.push({
+          filename:
+            filePath.split("/").pop() ||
+            "The-Brand-Strategist.pdf",
+
+          content: new Uint8Array(arrayBuffer),
+        });
+      }
+    } catch (error) {
+      console.error(
+        "Unable to attach book file:",
+        error
+      );
+    }
   }
 
-  if (payload._tracking) {
-    await supabase.from("email_log").insert({
-      reference_id: payload._tracking.id,
-      reference_type: payload._tracking.type,
-      to_email: payload.client_email,
-      status: "sent",
-      provider_response: "ok",
-      client_ip: ip,
-    });
+  return {
+    to: email,
+
+    subject:
+      "Your Book Order is Confirmed",
+
+    html: baseEmailTemplate(
+      content,
+      "Your book purchase has been successfully verified and confirmed."
+    ),
+
+    attachments,
+  };
+}
+
+/* =========================================================
+   SELECT EMAIL TEMPLATE
+   ========================================================= */
+
+async function buildEmail(
+  template: EmailTemplate,
+  data: EmailData
+) {
+  switch (template) {
+    case "registration":
+      return registrationEmail(data);
+
+    case "consultation":
+      return consultationEmail(data);
+
+    case "service_request":
+      return serviceRequestEmail(data);
+
+    case "book_order":
+      return await bookOrderEmail(data);
+
+    default:
+      throw new Error(
+        `Unsupported email template: ${template}`
+      );
+  }
+}
+
+/* =========================================================
+   SEND EMAIL
+   ========================================================= */
+
+async function sendConfirmationEmail(
+  emailOptions: any
+) {
+  if (!emailOptions?.to) {
+    throw new Error(
+      "Recipient email address is required."
+    );
   }
 
-  return new Response(JSON.stringify({ success: true }), {
-    status: 200,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  const result = await transporter.sendMail({
+    from: `"Adebimpe Mohammed" <${GMAIL_USER}>`,
+
+    to: emailOptions.to,
+
+    subject: emailOptions.subject,
+
+    html: emailOptions.html,
+
+    attachments:
+      emailOptions.attachments || [],
   });
+
+  return result;
+}
+
+/* =========================================================
+   HTTP SERVER
+   ========================================================= */
+
+Deno.serve(async (req) => {
+  /* -------------------------------------------------------
+     OPTIONS / CORS
+     ------------------------------------------------------- */
+
+  if (req.method === "OPTIONS") {
+    return new Response(
+      "ok",
+      {
+        headers: corsHeaders,
+      }
+    );
+  }
+
+  /* -------------------------------------------------------
+     ONLY POST
+     ------------------------------------------------------- */
+
+  if (req.method !== "POST") {
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: "Method not allowed",
+      }),
+      {
+        status: 405,
+        headers: {
+          ...corsHeaders,
+          "Content-Type":
+            "application/json",
+        },
+      }
+    );
+  }
+
+  try {
+    /* -----------------------------------------------------
+       READ REQUEST BODY
+       ----------------------------------------------------- */
+
+    const body = await req.json();
+
+    const template =
+      body?.template as EmailTemplate;
+
+    const data =
+      body?.data || {};
+
+    /* -----------------------------------------------------
+       VALIDATE TEMPLATE
+       ----------------------------------------------------- */
+
+    const validTemplates: EmailTemplate[] = [
+      "registration",
+      "consultation",
+      "service_request",
+      "book_order",
+    ];
+
+    if (
+      !template ||
+      !validTemplates.includes(template)
+    ) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error:
+            "Invalid or missing email template.",
+          validTemplates,
+        }),
+        {
+          status: 400,
+          headers: {
+            ...corsHeaders,
+            "Content-Type":
+              "application/json",
+          },
+        }
+      );
+    }
+
+    /* -----------------------------------------------------
+       BUILD EMAIL
+       ----------------------------------------------------- */
+
+    const emailOptions =
+      await buildEmail(
+        template,
+        data
+      );
+
+    /* -----------------------------------------------------
+       SEND EMAIL
+       ----------------------------------------------------- */
+
+    const result =
+      await sendConfirmationEmail(
+        emailOptions
+      );
+
+    /* -----------------------------------------------------
+       SUCCESS
+       ----------------------------------------------------- */
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+
+        messageId:
+          result.messageId,
+
+        template,
+
+        recipient:
+          emailOptions.to,
+      }),
+      {
+        status: 200,
+
+        headers: {
+          ...corsHeaders,
+          "Content-Type":
+            "application/json",
+        },
+      }
+    );
+  } catch (error: any) {
+    /* -----------------------------------------------------
+       ERROR
+       ----------------------------------------------------- */
+
+    console.error(
+      "send-confirmation-mail error:",
+      error
+    );
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+
+        error:
+          error?.message ||
+          "Unable to send email.",
+      }),
+      {
+        status: 500,
+
+        headers: {
+          ...corsHeaders,
+          "Content-Type":
+            "application/json",
+        },
+      }
+    );
+  }
 });
