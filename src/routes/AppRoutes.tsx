@@ -5,10 +5,10 @@ import HomePage from "@/pages/HomePage";
 import AboutPage from "@/pages/AboutPage";
 import ProjectsPage from "@/pages/ProjectsPage";
 import ProjectDetailPage from "@/pages/ProjectsDetailsPage";
-// import ContactPage from "@/pages/ContactPage";
 import ServicesPage from "@/pages/ServicesPage";
 import ServiceRequestPage from "@/pages/ServiceRequestPage";
 import ConsultationPage from "@/pages/ConsultationPage";
+import BookingPage from "@/pages/BookingPage";
 import BlogPage from "@/pages/BlogPage";
 import BlogPostPage from "@/pages/BlogPostPage";
 import BooksPage from "@/pages/BooksPage";
@@ -30,6 +30,7 @@ import DashboardProjects from "@/pages/dashboard/DashboardProjects";
 import DashboardTestimonials from "@/pages/dashboard/DashboardTestimonials";
 import { Loader2 } from "lucide-react";
 import { Outlet } from "react-router-dom";
+import AuthenticBrands from "@/pages/AuthenticBrands";
 
 function LoadingScreen() {
   return (
@@ -94,8 +95,9 @@ export default function AppRoutes() {
         <Route path="about" element={<AboutPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:slug" element={<ProjectDetailPage />} />
-        {/* <Route path="contact" element={<ContactPage />} /> */}
-         <Route path="book-a-session" element={<ConsultationPage />} />
+        <Route path="buildingauthenticbrands" element={<AuthenticBrands />} />
+         <Route path="one-on-one" element={<ConsultationPage />} />
+         <Route path="book-a-session" element={<BookingPage />} />
          <Route path="services" element={<ServicesPage />} />
          <Route path="services/:id" element={<ServiceRequestPage />} />
          <Route path="book" element={<BooksPage />} />

@@ -39,7 +39,7 @@ export const PRICING_TIERS: PricingTier[] = [
     highlighted: false,
     paymentRequired: true,
     ctaText: "Book Session",
-    ctaLink: "/book-a-session",
+    ctaLink: "/one-on-one",
   },
 
   {
