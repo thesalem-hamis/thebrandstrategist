@@ -1,460 +1,4 @@
-// import { useState } from "react";
-// import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-// import { ArrowDown, ArrowUpLeft, ArrowUpRight, Check, ChevronDown, CircleHelp } from "lucide-react";
-// import { Link } from "react-router-dom";
-// // Adjust these two paths to wherever your assets folder sits relative to this file.
-// import bookImage from "../assets/authentic.png";
-// import authorImage from "../assets/BIMPE-3.jpg";
-
-// /**
-//  * Building Authentic Brands — long-form book sales page.
-//  * Replace the purchase URL below when checkout is ready. The provided copy,
-//  * including its square-bracket placeholders, is intentionally preserved.
-//  */
-
-// const PURCHASE_URL = "#offer";
-
-// // Palette: burgundy is dominant, green stays for eyebrows, card borders and icons.
-// const BTN = "bg-[#7A1F2B] text-white border border-[#C0485A]/40 hover:bg-[#8F2636]";
-// const BURG = "text-[#C0485A]"; // lighter burgundy so large text stays readable on the dark background
-// const GREEN = "text-[#8DBB77]";
-// const BODY = "space-y-5 text-sm leading-7 text-white/65 sm:text-base sm:leading-8";
-// const GLOW = "bg-[#7A1F2B]/30";
-
-// const faqs = [
-//   { question: "Is this book only for business owners?", answer: "No. It's for entrepreneurs, graduates, creatives, career professionals and anyone who wants to be known for what they carry. Personal brands and business brands both get a full treatment." },
-//   { question: "I'm not sure what my brand even is yet. Is this too advanced?", answer: 'It\'s built for exactly that stage. The ZOOM Framework and the 7-Day Plan walk you from "I do a lot of things" to a clear one-sentence message.' },
-//   { question: "Will this help me charge more?", answer: "The book shows how clarity, presentation and positioning shape how people value you. That's what I've applied in my own work. Results depend on your offer, your market and how you apply what you learn, so no specific outcome is promised." },
-//   { question: "Do I need a big following or budget?", answer: "No. You need honesty about who you are and the willingness to take one aligned step at a time." },
-//   { question: "Can it help me rebrand after a setback or a pivot?", answer: "Yes. There's a full section on rebranding for businesses and for personal life, with a step-by-step example of rebuilding trust through consistent action." },
-//   { question: "How do I get the book after I pay?", answer: "[Delivery details: format, how and when it arrives, who to contact if there's a problem.]" },
-//   { question: "What if it isn't for me?", answer: "[Refund policy, or leave out if none.]" },
-// ];
-
-// const chapters = [
-//   { title: "What is branding, really?", text: "Learn what a brand is and isn't, the three kinds of brands (personal, business and rebrand), and why you already have a brand whether you've worked on it or not." },
-//   { title: "The branding dilemma.", text: "Spot the four traps that keep talented people invisible: identity confusion, a muffled message, going silent in transition, and an outside that doesn't match your inside." },
-//   { title: "The power of branding.", text: "See how intentional branding helped a teacher become Head of Department, a man rebuild his credibility after a public failure, an artisan outgrow her street corner, and a fresh graduate land global opportunities." },
-//   { title: "The ZOOM Framework.", text: "Build your brand in three levels of clarity: Zoom Out (purpose), Zoom Mid (strategy and positioning), Zoom In (visuals, voice and touchpoints). Includes a worksheet you can fill in right away." },
-//   { title: "The 7-Day Branding Action Plan.", text: "One powerful step a day: your why, your people, your offer, your message, your tone, your visuals, and finally, showing up." },
-//   { title: "Case studies of real brand builders.", text: "Learn from global icons and everyday people who used authenticity, vision and strategy to build brands that resonate." },
-// ];
-
-// const problems = [
-//   { n: "01", title: "You keep getting compared on price.", body: "When people can't tell what makes you different, the only thing left to compare is the number. So you drop it, and still don't always get the yes." },
-//   { n: "02", title: "You keep explaining yourself.", body: '"I do a lot of things." "It depends who I\'m talking to." If you can\'t say what you do in one sentence, your audience can\'t repeat it for you, and nobody refers what they can\'t describe.' },
-//   { n: "03", title: "Your outside doesn't match your inside.", body: "You've done the inner work. But your page, your photos and your proposals still look like a beginner's. People judge your value by what they see before they ever experience you." },
-//   { n: "04", title: "You keep going quiet while you figure it out.", body: "You're pivoting, growing or starting over, so you stop showing up until everything feels perfect. Meanwhile, your momentum slips." },
-//   { n: "05", title: "You keep second-guessing yourself.", body: "After enough almost-yeses, you start to wonder if you're good enough. The problem was never your ability. It was how you were being seen." },
-// ];
-
-// const fadeUp = { hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0 } };
-
-// function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-//   return (
-//     <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }} className={className}>
-//       {children}
-//     </motion.div>
-//   );
-// }
-
-// function Section({ id, alt = false, narrow = false, children }: { id?: string; alt?: boolean; narrow?: boolean; children: React.ReactNode }) {
-//   return (
-//     <section id={id} className={`border-b border-white/10 ${alt ? "bg-[#0d0e0e]" : ""}`}>
-//       <div className={`mx-auto ${narrow ? "max-w-4xl" : "max-w-7xl"} px-5 py-20 sm:px-8 sm:py-28 lg:px-12`}>{children}</div>
-//     </section>
-//   );
-// }
-
-// function SectionIntro({ eyebrow, title, children }: { eyebrow?: string; title: React.ReactNode; children?: React.ReactNode }) {
-//   return (
-//     <Reveal className="mx-auto mb-12 max-w-3xl text-center">
-//       {eyebrow && <p className={`mb-4 text-[10px] font-bold uppercase tracking-[0.24em] sm:text-xs ${GREEN}`}>{eyebrow}</p>}
-//       <h2 className="text-3xl font-semibold leading-[1.04] tracking-[-0.045em] text-white sm:text-4xl lg:text-6xl">{title}</h2>
-//       {children && <div className="mt-5 text-sm leading-7 text-white/65 sm:text-base">{children}</div>}
-//     </Reveal>
-//   );
-// }
-
-// function BuyButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-//   return (
-//     <a
-//       href={PURCHASE_URL}
-//       className={`group inline-flex min-h-12 items-center justify-center gap-3 rounded-full px-7 py-3.5 text-xs font-bold transition duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8DBB77] sm:text-sm ${BTN} ${className}`}
-//     >
-//       <span>{children}</span>
-//       <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-//     </a>
-//   );
-// }
-
-// function FaqAccordion() {
-//   const [openIndex, setOpenIndex] = useState<number | null>(0);
-//   return (
-//     <div className="divide-y divide-white/10 border-y border-white/10">
-//       {faqs.map((faq, index) => {
-//         const open = openIndex === index;
-//         return (
-//           <div key={faq.question} className="py-5 sm:py-6">
-//             <button type="button" onClick={() => setOpenIndex(open ? null : index)} aria-expanded={open} className="flex min-h-11 w-full items-center justify-between gap-5 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#8DBB77]">
-//               <span className="text-sm font-medium text-white sm:text-base">{faq.question}</span>
-//               <ChevronDown className={`h-4 w-4 shrink-0 text-[#8DBB77] transition-transform ${open ? "rotate-180" : ""}`} />
-//             </button>
-//             <AnimatePresence initial={false}>
-//               {open && (
-//                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
-//                   <p className="max-w-3xl pt-3 text-sm leading-7 text-white/60">{faq.answer}</p>
-//                 </motion.div>
-//               )}
-//             </AnimatePresence>
-//           </div>
-//         );
-//       })}
-//     </div>
-//   );
-// }
-
-// export default function AuthenticBrands() {
-//   const reduceMotion = useReducedMotion();
-
-//   return (
-//     <main className="min-h-screen overflow-hidden bg-[#080909] font-sans text-white selection:bg-[#7A1F2B] selection:text-white">
-//       {/* HERO */}
-//       <section className="relative border-b border-white/10">
-//         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(122,31,43,0.28),transparent_50%)]" />
-//         <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-7 sm:px-8 sm:pb-28 sm:pt-10 lg:px-12 lg:pb-32">
-//           <div className="mb-14 flex items-center justify-between sm:mb-20">
-//             <Link to="/" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75 transition hover:border-[#8DBB77] hover:text-white">
-//               <ArrowUpLeft className="h-3.5 w-3.5" />
-//               Go back
-//             </Link>
-//             <span className="text-xs font-semibold tracking-[0.18em] text-white/50">bnm.</span>
-//           </div>
-
-//           <motion.div initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10 mx-auto flex max-w-4xl flex-col items-center text-center">
-//             <p className={`mb-6 max-w-xl text-[10px] font-semibold uppercase leading-6 tracking-[0.19em] sm:text-xs ${GREEN}`}>
-//               For founders and professionals who are serious about being known, and paid, for what they carry.
-//             </p>
-//             <h1 className="text-[clamp(2.7rem,7.2vw,6.8rem)] font-semibold leading-[0.91] tracking-[-0.065em]">
-//               Same work.
-//               <br />
-//               <span className={BURG}>20x the price.</span>
-//               <br />
-//               The difference
-//               <br />
-//               is your <span className={BURG}>brand.</span>
-//             </h1>
-//             <p className="mt-7 max-w-xl text-sm leading-7 text-white/65 sm:mt-8 sm:text-base sm:leading-8">
-//               I charge $2,000 for work others sell for $100, and high-paying clients say yes. It isn't more talent. It's presentation, packaging, and clarity. <em>Building Authentic Brands</em> shows you how to build a brand that earns that trust without pretending to be someone you're not.
-//             </p>
-//             <div className="mt-8 flex flex-col items-center gap-4">
-//               <BuyButton>Get the Book Now</BuyButton>
-//               <p className="max-w-sm text-[11px] leading-5 text-white/45">[Price] · [Format, e.g. instant PDF download] · Includes the 7-Day Branding Action Plan</p>
-//             </div>
-//           </motion.div>
-
-//           <motion.div initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.1 }} className="relative mx-auto mt-14 w-full max-w-[520px]">
-//             <div className={`absolute inset-8 rounded-full ${GLOW} blur-3xl`} />
-//             <img src={bookImage} alt="Building Authentic Brands book mockup" className="relative z-10 mx-auto w-full object-contain drop-shadow-[0_28px_55px_rgba(0,0,0,0.5)]" />
-//           </motion.div>
-
-//           <div className="mx-auto mt-14 grid max-w-xl grid-cols-3 border-t border-white/15 pt-6 text-center">
-//             <div className="pr-3">
-//               <p className="text-2xl font-semibold tracking-tight sm:text-3xl">10<span className={BURG}>+</span></p>
-//               <p className="mt-2 text-[10px] leading-4 text-white/50 sm:text-xs">years building brands</p>
-//             </div>
-//             <div className="border-l border-white/15 px-3 sm:px-5">
-//               <p className="text-2xl font-semibold tracking-tight sm:text-3xl">500<span className={BURG}>+</span></p>
-//               <p className="mt-2 text-[10px] leading-4 text-white/50 sm:text-xs">companies, startups and individuals empowered</p>
-//             </div>
-//             <div className="border-l border-white/15 pl-3 sm:pl-5">
-//               <p className="text-2xl font-semibold tracking-tight sm:text-3xl">$2k<span className={BURG}> / </span>$100</p>
-//               <p className="mt-2 text-[10px] leading-4 text-white/50 sm:text-xs">the gap a brand makes</p>
-//             </div>
-//           </div>
-
-//           <div className="mx-auto mt-14 max-w-3xl border-t-2 border-[#8DBB77] pt-6 text-center">
-//             <p className="text-base leading-7 text-white/85 sm:text-lg sm:leading-8">
-//               This book is not for people who want a quick logo. It's for people ready to get clear, show up properly, and charge what they're worth.
-//             </p>
-//           </div>
-
-//           <div className="mt-10 grid gap-6 sm:grid-cols-3 sm:gap-5">
-//             {[
-//               "The ZOOM Framework: build your brand from purpose to visuals in three levels of clarity",
-//               "A 7-Day Branding Action Plan that takes you from blurry to visible in one week",
-//               "Real stories of people who rebuilt their credibility, raised their income and changed how they're seen",
-//             ].map((item) => (
-//               <div key={item} className="flex flex-col items-center gap-3 border-t border-white/15 pt-4 text-center text-xs leading-6 text-white/65">
-//                 <Check className="h-4 w-4 shrink-0 text-[#8DBB77]" />
-//                 <span>{item}</span>
-//               </div>
-//             ))}
-//           </div>
-//           <div className="mt-12 text-center">
-//             <a href="#problem" className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45 transition hover:text-[#8DBB77]">
-//               Discover the book <ArrowDown className="h-3.5 w-3.5" />
-//             </a>
-//           </div>
-//         </div>
-//       </section>
-
-//       {/* PROBLEM */}
-//       <Section id="problem" alt>
-//         <SectionIntro eyebrow="The problem" title="You're good at what you do. So why does it still feel like you're being overlooked?">
-//           <p>You have the skill. You have the experience. Maybe you have the passion, too.</p>
-//           <p className="mt-4">But when someone lands on your page, reads your proposal, or hears your name, it doesn't land. They hesitate. They ask for a discount. They pick the person who looks more sure of themselves, even when that person is less capable than you.</p>
-//           <p className="mt-4">And the painful part? Nobody tells you why.</p>
-//         </SectionIntro>
-
-//         <h3 className="mb-7 text-center text-lg font-medium tracking-tight text-white sm:text-2xl">Here's what unclear branding is quietly costing you.</h3>
-//         <div className="grid border-y border-white/10 md:grid-cols-2 md:gap-x-10">
-//           {problems.map((item) => (
-//             <Reveal key={item.n} className="grid grid-cols-[42px_1fr] gap-4 border-b border-white/10 py-6 sm:py-8">
-//               <span className={`pt-1 text-xs font-semibold ${GREEN}`}>{item.n}</span>
-//               <div>
-//                 <h4 className="text-base font-semibold text-white sm:text-lg">{item.title}</h4>
-//                 <p className="mt-3 text-sm leading-7 text-white/55">{item.body}</p>
-//               </div>
-//             </Reveal>
-//           ))}
-//         </div>
-//         <p className="mx-auto mt-10 max-w-3xl text-center text-xl font-medium leading-relaxed tracking-tight text-white sm:text-2xl">
-//           You can't outgrow confusion. You have to confront it. <span className={BURG}>And you can start today.</span>
-//         </p>
-//       </Section>
-
-//       {/* THE SHIFT */}
-//       <Section>
-//         <SectionIntro eyebrow="The shift" title={<>Two people. Same skill. One charges $100. One charges <span className={BURG}>$2,000.</span></>} />
-//         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-//           <div className="self-start rounded-2xl border border-[#8DBB77]/25 bg-[#101211] p-5 sm:p-7">
-//             <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
-//               <span className="text-xs text-white/50">$100</span>
-//               <div className="h-px flex-1 bg-white/15" />
-//               <span className={`text-xs font-semibold ${BURG}`}>$2,000</span>
-//             </div>
-//             <div className="mt-5 flex items-center gap-3">
-//               <div className="h-2 flex-1 rounded-full bg-white/10"><div className="h-2 w-[5%] rounded-full bg-white/45" /></div>
-//               <span className="text-[10px] text-white/40">Positioning</span>
-//             </div>
-//             <div className="mt-3 flex items-center gap-3">
-//               <div className="h-2 flex-1 rounded-full bg-white/10"><div className="h-2 w-full rounded-full bg-[#7A1F2B]" /></div>
-//               <span className="text-[10px] text-white/40">Perceived value</span>
-//             </div>
-//           </div>
-//           <div className={BODY}>
-//             <p>In my industry, there are things I charge $2,000 for that other people still sell for $100.</p>
-//             <p>The work isn't twenty times better. The difference is how it's presented, how it's packaged, and how clearly the person behind it is positioned.</p>
-//             <p>That's the same reason I attract high-paying clients. They don't pay for effort. They pay for confidence, clarity and the feeling that they're in the right hands. A brand creates that feeling before you say a single word.</p>
-//             <blockquote className="my-8 border-l-2 border-[#8DBB77] py-2 pl-5 text-xl font-medium leading-relaxed text-white sm:pl-7 sm:text-2xl">
-//               Your price is a reflection of your positioning. Change how you're seen, and you change what you can charge.
-//             </blockquote>
-//             <p>That's not a trick. It's a skill. And it can be learned, step by step, without faking who you are.</p>
-//             <p className="font-medium text-white">That's why I wrote this book.</p>
-//           </div>
-//         </div>
-//       </Section>
-
-//       {/* INTRODUCING THE BOOK */}
-//       <Section alt>
-//         <SectionIntro eyebrow="The book" title={<>Introducing <em>Building Authentic Brands</em></>}>
-//           <p className="text-lg text-white sm:text-xl">How to craft a powerful, authentic brand that can change the course of your life or business.</p>
-//         </SectionIntro>
-//         <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-//           <div className="relative mx-auto w-full max-w-sm">
-//             <div className={`absolute inset-4 rounded-full ${GLOW} blur-3xl`} />
-//             <img src={bookImage} alt="Building Authentic Brands" className="relative w-full drop-shadow-[0_30px_45px_rgba(0,0,0,0.5)]" />
-//           </div>
-//           <div>
-//             <div className={BODY}>
-//               <p>This book was born from more than a decade of working with people and businesses who struggled, not because they lacked talent or passion, but because they lacked clarity in how they presented themselves.</p>
-//               <p>It gives you a clear path to discovering, building and expressing a brand that truly reflects who you are or what your business stands for. No fluff. No borrowed personality. No waiting until everything is perfect.</p>
-//               <p>Every chapter gives you insight, reflection, real examples and practical steps, so you move from confusion to clarity, and from clarity to being seen.</p>
-//             </div>
-//             <div className="mt-8 text-center lg:text-left">
-//               <BuyButton>Get the Book Now</BuyButton>
-//             </div>
-//           </div>
-//         </div>
-//       </Section>
-
-//       {/* WHAT'S INSIDE */}
-//       <Section>
-//         <SectionIntro eyebrow="What's inside" title={<>Everything you need to go from blurry to <span className={BURG}>bold.</span></>} />
-//         <div className="grid gap-4 md:grid-cols-2">
-//           {chapters.map((chapter, index) => (
-//             <Reveal key={chapter.title} delay={index * 0.04} className="rounded-2xl border border-[#8DBB77]/25 bg-[#101211] p-6 transition-colors hover:border-[#8DBB77]/60 sm:p-8">
-//               <span className={`text-[10px] font-semibold tracking-[0.2em] ${GREEN}`}>0{index + 1}</span>
-//               <h3 className="mt-4 text-lg font-semibold tracking-tight text-white sm:text-xl">{chapter.title}</h3>
-//               <p className="mt-3 text-sm leading-7 text-white/60">{chapter.text}</p>
-//             </Reveal>
-//           ))}
-//           <div className="rounded-2xl border border-[#8DBB77]/30 bg-[#8DBB77]/[0.07] p-6 text-center sm:p-8 md:col-span-2">
-//             <p className={`text-[10px] font-bold uppercase tracking-[0.2em] ${GREEN}`}>Plus</p>
-//             <p className="mt-3 text-base leading-7 text-white sm:text-lg">reflection questions, practical next steps and a full section on rebranding for anyone starting over.</p>
-//           </div>
-//         </div>
-//         <div className="mt-10 text-center">
-//           <BuyButton>Yes, I'm Ready to Build</BuyButton>
-//         </div>
-//       </Section>
-
-//       {/* WHO THIS IS FOR */}
-//       <Section alt>
-//         <SectionIntro eyebrow="Who this is for" title="Read this before you buy." />
-//         <div className="grid gap-6 lg:grid-cols-2">
-//           <div className="rounded-2xl border border-[#8DBB77]/25 bg-[#8DBB77]/[0.06] p-6 sm:p-8">
-//             <h3 className={`text-lg font-semibold ${GREEN}`}>This book is for you if:</h3>
-//             <ul className="mt-6 space-y-4">
-//               {[
-//                 "You're an entrepreneur, consultant, creative or coach whose work is better than your positioning",
-//                 "You're tired of competing on price and want to charge what your work is actually worth",
-//                 "You're a professional ready to be seen as a leader, not just a name on the team",
-//                 "You're rebuilding after a pivot, a setback or a season of silence",
-//                 "You want a brand that feels like you, not a copy of someone louder",
-//                 "You'd rather take imperfect, aligned action this week than wait for the perfect brand",
-//               ].map((item) => (
-//                 <li key={item} className="flex gap-3 text-sm leading-6 text-white/75">
-//                   <Check className="mt-1 h-4 w-4 shrink-0 text-[#8DBB77]" />
-//                   <span>{item}</span>
-//                 </li>
-//               ))}
-//             </ul>
-//           </div>
-//           <div className="rounded-2xl border border-white/10 bg-[#101211] p-6 sm:p-8">
-//             <h3 className="text-lg font-semibold text-white">This book is not for you if:</h3>
-//             <ul className="mt-6 space-y-4">
-//               {[
-//                 "You want a magic logo that fixes everything overnight",
-//                 "You're looking to fake an image you have no intention of living up to",
-//                 "You're not willing to do a little honest reflection",
-//               ].map((item) => (
-//                 <li key={item} className="flex gap-3 text-sm leading-6 text-white/65">
-//                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C0485A]" />
-//                   <span>{item}</span>
-//                 </li>
-//               ))}
-//             </ul>
-//           </div>
-//         </div>
-//         <p className="mx-auto mt-10 max-w-4xl text-center text-lg leading-8 text-white sm:text-2xl sm:leading-9">
-//           You don't need millions of followers. You don't need to go viral. <span className={BURG}>You just need to be authentic, aligned and intentional.</span>
-//         </p>
-//       </Section>
-
-//       {/* AUTHOR */}
-//       <Section>
-//         <SectionIntro eyebrow="Why learn from me" title="I don't just teach branding. I price and position with it." />
-//         <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
-//           <div className="mx-auto w-full max-w-md self-start overflow-hidden rounded-2xl border border-[#8DBB77]/25 lg:max-w-none">
-//             <img src={authorImage} alt="Adebimpe Mohammed" className="aspect-[4/5] w-full object-cover" />
-//           </div>
-//           <div>
-//             <div className={BODY}>
-//               <p>My name is Adebimpe Mohammed. I'm a strategist, brand developer and the founder of BNM Brand House, a branding agency based in West Africa that has empowered over 500 companies, startups and individuals with transformative brand strategies.</p>
-//               <p>With more than a decade of hands-on experience in the creative industry, I've helped countless businesses find clarity, define their voice and stand out in saturated markets.</p>
-//               <p>I also serve on the boards of several organizations as a trusted brand advisor, and I hold a Master's degree in Business Administration.</p>
-//               <p>But here's the proof I care about most: in my own industry, I charge $2,000 for things others still charge $100 for, and I attract high-paying clients. Not because I work twenty times harder. Because of how I present, package and position what I do.</p>
-//               <p className="font-medium text-white">This book is that thinking, laid out step by step, so you can use it too.</p>
-//             </div>
-//             <p className="mt-6 text-xs leading-6 text-white/45">
-//               [Proof slot (optional): Add 2 to 3 client testimonials or a screenshot of a high-ticket client win here. Specific results will do more work than adjectives.]
-//             </p>
-//           </div>
-//         </div>
-//       </Section>
-
-//       {/* OFFER */}
-//       <Section id="offer" alt>
-//         <SectionIntro eyebrow="The offer" title={<>Get <em>Building Authentic Brands</em> today.</>}>
-//           <p>What you get:</p>
-//         </SectionIntro>
-//         <div className="mx-auto max-w-3xl rounded-3xl border border-[#8DBB77]/25 bg-[#101211] p-6 sm:p-10 lg:p-12">
-//           <div className="grid gap-4 sm:grid-cols-2">
-//             {[
-//               "The full book: Building Authentic Brands",
-//               "The ZOOM Framework, with its self-application worksheet",
-//               "The 7-Day Branding Action Plan, to reuse every quarter",
-//               "Reflection questions and practical next steps in every chapter",
-//               "Real case studies of brand builders, from everyday people to global icons",
-//             ].map((item) => (
-//               <div key={item} className="flex gap-3 text-sm leading-6 text-white/75">
-//                 <Check className="mt-1 h-4 w-4 shrink-0 text-[#8DBB77]" />
-//                 <span>{item}</span>
-//               </div>
-//             ))}
-//           </div>
-//           <div className="my-8 border-t border-white/10" />
-//           <div className="text-center">
-//             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">Price</p>
-//             <p className={`mt-2 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl ${BURG}`}>[Price]</p>
-//           </div>
-//           <div className="mt-7">
-//             <BuyButton className="w-full">Get the Book Now</BuyButton>
-//           </div>
-//           <p className="mt-4 text-center text-xs leading-6 text-white/45">[Secure checkout line / payment methods / delivery format, e.g. "Instant access after payment"]</p>
-//           <div className="mt-8 space-y-3 border-t border-white/10 pt-6 text-center text-xs leading-6 text-white/40">
-//             <p>[Optional guarantee (add only if you'll honour it): Read it. Work through the 7-Day Plan. If you don't come away with more clarity about your brand, [refund terms].]</p>
-//             <p>[Optional urgency (only if real): [Launch price ends on date] or [Bonus included until date]. Avoid fake scarcity; this audience values authenticity.]</p>
-//           </div>
-//         </div>
-//       </Section>
-
-//       {/* FAQ */}
-//       <Section narrow>
-//         <SectionIntro eyebrow="FAQ" title="Frequently asked questions.">
-//           <CircleHelp className="mx-auto mb-4 h-6 w-6 text-[#8DBB77]" />
-//         </SectionIntro>
-//         <FaqAccordion />
-//       </Section>
-
-//       {/* FINAL CTA */}
-//       <section className="relative">
-//         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(122,31,43,0.3),transparent_60%)]" />
-//         <div className="relative mx-auto max-w-5xl px-5 py-24 text-center sm:px-8 sm:py-32">
-//           <p className={`mb-5 text-[10px] font-bold uppercase tracking-[0.24em] ${GREEN}`}>Building Authentic Brands</p>
-//           <h2 className="text-4xl font-semibold leading-[1.02] tracking-[-0.055em] sm:text-6xl lg:text-7xl">
-//             You can keep hoping people will see your value. Or you can <span className={BURG}>show them.</span>
-//           </h2>
-//           <p className="mx-auto mt-7 max-w-3xl text-sm leading-7 text-white/60 sm:text-base sm:leading-8">
-//             Your next high-paying client, your next opportunity, your next level of influence is already watching how you show up. The only question is what they see.
-//           </p>
-//           <p className="mt-6 text-xl font-medium text-white sm:text-2xl">You are the brand. Make it count.</p>
-//           <div className="mt-8">
-//             <BuyButton>Get Building Authentic Brands Now</BuyButton>
-//           </div>
-//           <p className="mt-4 text-xs text-white/45">Be known for what you carry.</p>
-//         </div>
-//       </section>
-
-//       {/* FOOTER */}
-//       <footer className="border-t border-white/10 px-5 py-8 sm:px-8">
-//         <div className="mx-auto flex max-w-7xl flex-col gap-4 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
-//           <p>© Adebimpe Mohammed · BNM Brand House</p>
-//           <p>[Contact / social links] · [Terms / privacy]</p>
-//         </div>
-//       </footer>
-
-//       {/* Sticky purchase bar */}
-//       <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#080909]/95 px-4 py-3 backdrop-blur-xl">
-//         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-//           <div className="min-w-0">
-//             <p className="truncate text-xs font-semibold text-white sm:text-sm">Building Authentic Brands</p>
-//             <p className="text-[10px] text-white/45">[Price]</p>
-//           </div>
-//           <a href={PURCHASE_URL} className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-5 py-3 text-[10px] font-bold transition sm:text-xs ${BTN}`}>
-//             Get the Book <ArrowUpRight className="h-3.5 w-3.5" />
-//           </a>
-//         </div>
-//       </div>
-//       <div className="h-[72px]" aria-hidden="true" />
-//     </main>
-//   );
-// }
-
-
-import { useState } from "react";
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaBehance, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, ArrowUpRight, Check, ChevronDown, CircleHelp, X } from "lucide-react";
@@ -464,17 +8,183 @@ import authorImage from "../assets/BIMPE-3.jpg";
 
 /**
  * Building Authentic Brands — long-form book sales page.
- * Replace the purchase URL below when checkout is ready. The provided copy,
+ * Every buy button points to the Selar checkout below. The provided copy,
  * including its square-bracket placeholders, is intentionally preserved.
  */
 
-const PURCHASE_URL = "#offer";
+const PURCHASE_URL = "https://selar.com/bab";
 
 // Palette: burgundy is dominant, green stays for eyebrows, card borders and icons.
 const BTN = "bg-[#7A1F2B] text-white border border-[#C0485A]/40 hover:bg-[#8F2636]";
 const BURG = "text-[#C0485A]"; // lighter burgundy so large text stays readable on the dark background
 const GREEN = "text-[#8DBB77]";
 const BODY = "space-y-5 text-sm leading-7 text-white/65 sm:text-base sm:leading-8";
+
+/* ------------------------------------------------------------------ */
+/* CURRENCY: USD / NGN toggle                                          */
+/* ------------------------------------------------------------------ */
+
+const PRICE_USD = 27;
+// Used only if the live rate can't be fetched. Update it now and then.
+const FALLBACK_NGN_RATE = 1500;
+
+type Currency = "USD" | "NGN";
+type CurrencyCtx = { currency: Currency; setCurrency: (c: Currency) => void; rate: number };
+
+const CurrencyContext = createContext<CurrencyCtx>({
+  currency: "USD",
+  setCurrency: () => {},
+  rate: FALLBACK_NGN_RATE,
+});
+
+function CurrencyProvider({ children }: { children: React.ReactNode }) {
+  // Remembers the visitor's choice; first-time visitors in Lagos's timezone start on Naira.
+  const [currency, setCurrencyState] = useState<Currency>(() => {
+    try {
+      const saved = localStorage.getItem("bab-currency");
+      if (saved === "USD" || saved === "NGN") return saved;
+      return Intl.DateTimeFormat().resolvedOptions().timeZone === "Africa/Lagos" ? "NGN" : "USD";
+    } catch {
+      return "USD";
+    }
+  });
+  const [rate, setRate] = useState(FALLBACK_NGN_RATE);
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    fetch("https://open.er-api.com/v6/latest/USD", { signal: ctrl.signal })
+      .then((r) => r.json())
+      .then((d) => {
+        const ngn = d?.rates?.NGN;
+        if (typeof ngn === "number" && ngn > 0) setRate(ngn);
+      })
+      .catch(() => {});
+    return () => ctrl.abort();
+  }, []);
+
+  const setCurrency = (c: Currency) => {
+    setCurrencyState(c);
+    try {
+      localStorage.setItem("bab-currency", c);
+    } catch {}
+  };
+
+  return <CurrencyContext.Provider value={{ currency, setCurrency, rate }}>{children}</CurrencyContext.Provider>;
+}
+
+function Price() {
+  const { currency, rate } = useContext(CurrencyContext);
+  if (currency === "USD") return <>${PRICE_USD}</>;
+  // Rounded to the nearest ₦100 so it reads like a real price tag.
+  const ngn = Math.round((PRICE_USD * rate) / 100) * 100;
+  return <>₦{ngn.toLocaleString("en-NG")}</>;
+}
+
+function PriceNote() {
+  const { currency } = useContext(CurrencyContext);
+  if (currency !== "NGN") return null;
+  return <>Naira price follows today's exchange rate and may differ slightly at checkout.</>;
+}
+
+function CurrencyToggle({ className = "" }: { className?: string }) {
+  const { currency, setCurrency } = useContext(CurrencyContext);
+  return (
+    <div role="group" aria-label="Choose currency" className={`inline-flex rounded-full border border-white/15 p-0.5 text-[11px] font-semibold ${className}`}>
+      {(["USD", "NGN"] as const).map((c) => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => setCurrency(c)}
+          aria-pressed={currency === c}
+          className={`min-h-8 rounded-full px-4 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#8DBB77] ${
+            currency === c ? "bg-[#7A1F2B] text-white" : "text-white/55 hover:text-white"
+          }`}
+        >
+          {c === "USD" ? "$ USD" : "₦ NGN"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* SCROLL STORY: content is revealed by scroll position                */
+/* ------------------------------------------------------------------ */
+/**
+ * Every heading, paragraph, list item, quote and image below the hero is tied
+ * directly to scroll position. Headings wipe in left to right, the rest rises
+ * and fades in, and it un-reveals if you scroll back up. Add data-reveal to any
+ * extra element you want included (avoid ones with Tailwind `transition`).
+ */
+function useScrollStory(rootRef: React.RefObject<HTMLElement | null>) {
+  const reduceMotion = useReducedMotion();
+
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || reduceMotion) return;
+
+    const SELECTOR =
+      "main > section:not(:first-of-type) :is(h2,h3,h4,p,li,blockquote,img):not(article *):not(figure *), [data-reveal]";
+
+    const items = Array.from(root.querySelectorAll<HTMLElement>(SELECTOR)).map((el) => ({
+      el,
+      heading: el.matches("h2,h3") || el.hasAttribute("data-heading"),
+      last: -1,
+    }));
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const vh = window.innerHeight;
+      for (const item of items) {
+        const { el, heading } = item;
+        const from = vh * (heading ? 0.94 : 0.96);
+        const to = vh * (heading ? 0.5 : 0.72);
+        const top = el.getBoundingClientRect().top;
+        const p = Math.min(1, Math.max(0, (from - top) / (from - to)));
+        if (Math.abs(p - item.last) < 0.004) continue;
+        item.last = p;
+
+        if (p >= 1) {
+          el.style.removeProperty("opacity");
+          el.style.removeProperty("transform");
+          el.style.removeProperty("mask-image");
+          el.style.removeProperty("-webkit-mask-image");
+          continue;
+        }
+        el.style.transform = `translate3d(0, ${(1 - p) * 28}px, 0)`;
+        if (heading) {
+          const mask = `linear-gradient(105deg, #000 ${p * 150 - 50}%, transparent ${p * 150}%)`;
+          el.style.setProperty("mask-image", mask);
+          el.style.setProperty("-webkit-mask-image", mask);
+        } else {
+          el.style.opacity = String(p);
+        }
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (frame) cancelAnimationFrame(frame);
+      for (const { el } of items) {
+        el.style.removeProperty("opacity");
+        el.style.removeProperty("transform");
+        el.style.removeProperty("mask-image");
+        el.style.removeProperty("-webkit-mask-image");
+      }
+    };
+  }, [rootRef, reduceMotion]);
+}
+
+/* ------------------------------------------------------------------ */
 
 const faqs = [
   { question: "Is this book only for business owners?", answer: "No. It's for entrepreneurs, graduates, creatives, career professionals and anyone who wants to be known for what they carry. Personal brands and business brands both get a full treatment." },
@@ -591,14 +301,9 @@ function TestimonialWall() {
   );
 }
 
-const fadeUp = { hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0 } };
-
-function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  return (
-    <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }} className={className}>
-      {children}
-    </motion.div>
-  );
+// Reveal is now a plain wrapper: the scroll story hook handles all reveals.
+function Reveal({ children, className = "" }: { children: React.ReactNode; className?: string; delay?: number }) {
+  return <div className={className}>{children}</div>;
 }
 
 function Section({ id, alt = false, narrow = false, children }: { id?: string; alt?: boolean; narrow?: boolean; children: React.ReactNode }) {
@@ -623,6 +328,8 @@ function BuyButton({ children, className = "" }: { children: React.ReactNode; cl
   return (
     <a
       href={PURCHASE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
       className={`group inline-flex min-h-12 items-center justify-center gap-3 rounded-full px-7 py-3.5 text-xs font-bold transition duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8DBB77] sm:text-sm ${BTN} ${className}`}
     >
       <span>{children}</span>
@@ -658,10 +365,20 @@ function FaqAccordion() {
 }
 
 export default function AuthenticBrands() {
+  return (
+    <CurrencyProvider>
+      <AuthenticBrandsPage />
+    </CurrencyProvider>
+  );
+}
+
+function AuthenticBrandsPage() {
+  const mainRef = useRef<HTMLElement>(null);
+  useScrollStory(mainRef);
   const reduceMotion = useReducedMotion();
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#080909] font-sans text-white selection:bg-[#7A1F2B] selection:text-white">
+    <main ref={mainRef} className="min-h-screen overflow-hidden bg-[#080909] font-sans text-white selection:bg-[#7A1F2B] selection:text-white">
       {/* HERO */}
       <section className="relative border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(122,31,43,0.28),transparent_50%)]" />
@@ -683,7 +400,8 @@ export default function AuthenticBrands() {
             </p>
             <div className="mt-8 flex flex-col items-center gap-4">
               <BuyButton>Get the Book Now</BuyButton>
-              <p className="max-w-sm text-[11px] leading-5 text-white/45">$27 · Instant PDF download · Includes the 7-Day Branding Action Plan</p>
+              <p className="max-w-sm text-[11px] leading-5 text-white/45"><Price /> · Instant PDF download · Includes the 7-Day Branding Action Plan</p>
+              <CurrencyToggle />
             </div>
           </motion.div>
 
@@ -928,7 +646,9 @@ export default function AuthenticBrands() {
           </div>
           <div className="my-8 border-t border-white/10" />
           <div className="text-center">
-            <p className={`mt-2 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl ${BURG}`}>$27</p>
+            <CurrencyToggle className="mb-4" />
+            <p className={`mt-2 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl ${BURG}`}><Price /></p>
+            <p className="mt-2 text-[11px] text-white/40"><PriceNote /></p>
           </div>
           <div className="mt-7">
             <BuyButton className="w-full">Get the Book Now</BuyButton>
@@ -982,9 +702,14 @@ export default function AuthenticBrands() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="truncate text-xs font-semibold text-white sm:text-sm">Building Authentic Brands</p>
-            <p className="text-[10px] text-white/45">$27</p>
+            <p className="text-[10px] text-white/45"><Price /></p>
           </div>
-          <a href={PURCHASE_URL} className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-5 py-3 text-[10px] font-bold transition sm:text-xs ${BTN}`}>
+          <a
+            href={PURCHASE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-5 py-3 text-[10px] font-bold transition sm:text-xs ${BTN}`}
+          >
             Get the Book <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
         </div>
