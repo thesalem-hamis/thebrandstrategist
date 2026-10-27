@@ -1098,7 +1098,7 @@ export default function DashboardBooks() {
                       })
                     }
                     className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-xs outline-none focus:border-[#5D1F17]"
-                    placeholder="Bimpe Mohammed"
+                    placeholder="Adebimpe Mohammed"
                   />
                 </div>
               </div>

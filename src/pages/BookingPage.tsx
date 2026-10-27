@@ -537,7 +537,7 @@ export default function BookingPage() {
 
                   <p className="text-xs text-neutral-600 leading-relaxed mb-8">
                     A comprehensive 60-minute virtual
-                    strategy session directly with Bimpe
+                    strategy session directly with Adebimpe
                     Mohammed to refine your brand
                     position and execution path.
                   </p>
@@ -550,7 +550,7 @@ export default function BookingPage() {
                       </span>
 
                       <span className="font-medium text-neutral-900">
-                        Bimpe Mohammed
+                        Adebimpe Mohammed
                       </span>
                     </div>
 
