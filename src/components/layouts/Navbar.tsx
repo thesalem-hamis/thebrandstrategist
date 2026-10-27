@@ -138,7 +138,7 @@ export function Navbar() {
                 transition={{ duration: 0.2, ease: "easeInOut" }}
               >
                 <Link
-                  to="/book-a-session"
+                  to="/one-on-one"
                   className="flex items-center justify-center h-auto rounded-full bg-[#5D1F17] px-4 py-2 md:px-[18px] md:py-[9px] text-[10px] md:text-[11px] font-semibold tracking-[0.02em] text-white uppercase whitespace-nowrap shadow-md transition-colors duration-200 hover:bg-[#4a1812]"
                 >
                   BOOK A CONSULTATION
@@ -211,7 +211,7 @@ export function Navbar() {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-                onClick={() => handleMobileNavigate("/book-a-session")}
+                onClick={() => handleMobileNavigate("/one-on-one")}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-[#5D1F17] py-5 text-sm font-semibold uppercase tracking-wider text-white shadow-xl transition-colors duration-200 hover:bg-[#4a1812]"
               >
                 BOOK A CONSULTATION

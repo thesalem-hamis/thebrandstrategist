@@ -24,9 +24,9 @@ const BODY = "space-y-5 text-sm leading-7 text-white/65 sm:text-base sm:leading-
 /* CURRENCY: USD / NGN toggle                                          */
 /* ------------------------------------------------------------------ */
 
-const PRICE_USD = 27;
+const PRICE_USD = 7.39;
 // Used only if the live rate can't be fetched. Update it now and then.
-const FALLBACK_NGN_RATE = 1500;
+const FALLBACK_NGN_RATE = 1343.17;
 
 type Currency = "USD" | "NGN";
 type CurrencyCtx = { currency: Currency; setCurrency: (c: Currency) => void; rate: number };

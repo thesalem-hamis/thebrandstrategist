@@ -246,7 +246,7 @@ export function Hero() {
 
             {/* Burgundy CTA Button */}
             <motion.a
-              href="/book-a-session"
+              href="/one-on-one"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}

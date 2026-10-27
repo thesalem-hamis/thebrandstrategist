@@ -192,7 +192,7 @@ const pricingPlans: PricingPlan[] = [
     ],
     highlighted: true,
     buttonText: "Book Session",
-    buttonLink: "/book-a-session",
+    buttonLink: "/one-on-one",
   },
   {
     price: "$1,500",
