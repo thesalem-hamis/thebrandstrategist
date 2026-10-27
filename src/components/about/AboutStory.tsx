@@ -166,7 +166,7 @@ export function AboutStory() {
               Platform & Media
             </p>
             <p className="text-xs leading-relaxed text-neutral-700 sm:text-sm">
-              Creator of <strong>Unbrand with BNM</strong>, exploring differentiation, consistency, and strategic brand positioning.
+              Creator of <strong>Onbrand with BNM</strong>, exploring differentiation, consistency, and strategic brand positioning.
             </p>
           </div>
 

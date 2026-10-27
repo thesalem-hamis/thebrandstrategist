@@ -384,7 +384,7 @@ function AuthenticBrandsPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_38%,rgba(122,31,43,0.28),transparent_50%)]" />
         <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-24 sm:px-8 sm:pb-28 sm:pt-36 lg:px-12 lg:pb-32">
           <motion.div initial={reduceMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }} className="relative z-10 mx-auto flex max-w-6xl flex-col items-center text-center">
-            <p className={`mb-6 max-w-2xl text-[10px] font-semibold uppercase leading-6 tracking-[0.19em] sm:text-xs ${GREEN}`}>
+            <p className={`mb-6 max-w-2xl text-[10px] font-semibold uppercase leading-6 tracking-[0.19em] text-[#A9D894] [text-shadow:0_0_6px_rgba(141,187,119,0.9),0_0_18px_rgba(141,187,119,0.55),0_0_36px_rgba(141,187,119,0.3)] sm:text-xs`}>
               For founders and professionals who are serious about being known, and paid, for what they carry.
             </p>
             <h1 className="text-balance text-[clamp(2.5rem,6.4vw,5.8rem)] font-semibold leading-[0.95] tracking-[-0.06em]">

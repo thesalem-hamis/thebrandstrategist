@@ -980,7 +980,14 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, Check, ChevronDown, X } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpLeft,
+  ArrowUpRight,
+  Check,
+  ChevronDown,
+  X,
+} from "lucide-react";
 import {
   FaBehance,
   FaInstagram,
@@ -1453,7 +1460,20 @@ export default function ConsultationSalesPage() {
     <main className="min-h-screen w-full overflow-hidden bg-white font-sans text-neutral-900 selection:bg-[#5D1F17] selection:text-white">
       {/* HERO — clean white background, no red glow */}
       <section className="relative w-full overflow-hidden border-b border-neutral-200 bg-white">
-        <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 pb-20 pt-20 text-center sm:px-12 sm:pb-28 sm:pt-28 lg:pt-36">
+        {/* GO BACK button */}
+        <div className="mx-auto max-w-7xl px-6 pt-20 sm:px-12 sm:pt-28 lg:px-20 lg:pt-36">
+          <div className="flex justify-start">
+            <Link
+              to="/"
+              className="group/btn inline-flex items-center gap-2 rounded-full border border-[#5D1F17] bg-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#5D1F17] shadow transition-all duration-200 hover:border-neutral-900 hover:text-neutral-900 hover:shadow-md"
+            >
+              <ArrowUpLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:-translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+              <span>GO BACK</span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="relative mx-auto flex max-w-5xl flex-col items-center px-6 pb-20 pt-4 text-center sm:px-12 sm:pb-28 sm:pt-6 lg:pt-8">
           <Reveal>
             <p
               className={`mx-auto mb-6 mt-8 max-w-2xl text-xs font-semibold leading-relaxed sm:mt-12 sm:text-sm ${BURG}`}

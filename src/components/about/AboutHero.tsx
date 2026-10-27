@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowUpLeft, ArrowUpRight } from "lucide-react";
 import { TextAnimate } from "@/components/ui/text-animate";
 
 import aboutHeroImg from "@/assets/BIMPE.jpg";
@@ -54,13 +55,24 @@ export function AboutHero() {
     <section className="w-full border-b border-neutral-200 bg-white px-6 py-16 font-sans text-neutral-900 sm:px-12 sm:py-24 lg:px-20">
       <div className="mx-auto max-w-7xl">
 
+        {/* 0. GO BACK button */}
+        <div className="mt-10 flex justify-start sm:mt-16 lg:mt-12">
+          <Link
+            to="/"
+            className="group/btn inline-flex items-center gap-2 rounded-full border border-[#5D1F17] bg-white px-5 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#5D1F17] shadow transition-all duration-200 hover:border-neutral-900 hover:text-neutral-900 hover:shadow-md"
+          >
+            <ArrowUpLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:-translate-x-0.5 group-hover/btn:-translate-y-0.5" />
+            <span>GO BACK</span>
+          </Link>
+        </div>
+
         {/* 1. Headline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-8 mt-10 sm:mb-12 sm:mt-16 lg:mt-20"
+          className="mb-8 mt-6 sm:mb-12 sm:mt-8"
         >
           <h1 className="whitespace-normal text-2xl font-semibold uppercase leading-tight tracking-[-0.02em] text-neutral-900 sm:text-5xl lg:text-[64px]">
             ADEBIMPE MOHAMMED
@@ -102,7 +114,7 @@ export function AboutHero() {
             className="flex items-start justify-start md:col-span-2 md:justify-end"
           >
             <a
-              href="/book-a-session"
+              href="/one-on-one"
               className="group inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#5D1F17] transition-colors hover:text-neutral-900"
             >
               <span>BOOK CONSULTATION</span>
