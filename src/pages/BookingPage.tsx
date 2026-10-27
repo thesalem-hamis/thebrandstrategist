@@ -14,6 +14,7 @@ import {
   User,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import paystackLogo from "@/assets/paystack.png";
 
 // Where "GO BACK" sends people. Change this to the route your sales page lives on.
 const SALES_ROUTE = "/one-on-one";
@@ -343,7 +344,7 @@ export default function BookingPage() {
           >
             <p className="text-xs sm:text-sm leading-relaxed text-neutral-700 font-normal">
               Book a dedicated private session with
-              Bimpe Mohammed to assess your current
+              Adebimpe Mohammed to assess your current
               brand architecture, refine audience
               positioning, and create high-level
               strategy tailored to your long-term
@@ -693,22 +694,22 @@ export default function BookingPage() {
                     </div>
                   </div>
 
-                  <div className="mt-auto flex gap-3">
+                  <div className="mt-auto flex gap-2 sm:gap-3">
 
                     <button
                       type="button"
                       onClick={() => setStep("pick")}
-                      className="flex-1 border border-zinc-200 rounded-full text-neutral-600 hover:border-neutral-400 font-semibold text-xs tracking-wider uppercase py-3.5 px-6 transition-colors duration-300"
+                      className="shrink-0 border border-zinc-200 rounded-full text-neutral-600 hover:border-neutral-400 font-semibold text-[10px] sm:text-xs tracking-wide sm:tracking-wider uppercase py-3.5 px-3.5 sm:flex-1 sm:px-6 transition-colors duration-300"
                     >
                       Back
                     </button>
 
                     <button
                       type="submit"
-                      className="flex-[2] inline-flex items-center justify-center gap-2 bg-[#5D1F17] hover:bg-[#4A1812] text-white rounded-full font-semibold text-xs tracking-wider uppercase py-3.5 px-6 transition-all duration-300 shadow hover:shadow-md"
+                      className="min-w-0 flex-1 sm:flex-[2] inline-flex items-center justify-center gap-2 bg-[#5D1F17] hover:bg-[#4A1812] text-white rounded-full font-semibold text-[10px] sm:text-xs leading-tight text-center tracking-wide sm:tracking-wider uppercase py-3.5 px-3 sm:px-6 transition-all duration-300 shadow hover:shadow-md"
                     >
                       <span>Proceed to Payment</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
+                      <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
                     </button>
                   </div>
                 </motion.form>
@@ -789,9 +790,11 @@ export default function BookingPage() {
                       </span>
                     </div>
 
-                    <span className="font-bold text-xs tracking-tight text-[#0BA4DB]">
-                      paystack
-                    </span>
+                    <img
+                      src={paystackLogo}
+                      alt="Paystack"
+                      className="h-4 w-auto object-contain"
+                    />
                   </div>
 
                   {paymentError && (
@@ -807,13 +810,13 @@ export default function BookingPage() {
                     </div>
                   )}
 
-                  <div className="mt-auto flex gap-3">
+                  <div className="mt-auto flex gap-2 sm:gap-3">
 
                     <button
                       type="button"
                       onClick={() => setStep("details")}
                       disabled={isProcessing}
-                      className="flex-1 border border-zinc-200 rounded-full text-neutral-600 hover:border-neutral-400 font-semibold text-xs tracking-wider uppercase py-3.5 px-6 transition-colors duration-300 disabled:opacity-50"
+                      className="shrink-0 border border-zinc-200 rounded-full text-neutral-600 hover:border-neutral-400 font-semibold text-[10px] sm:text-xs tracking-wide sm:tracking-wider uppercase py-3.5 px-3.5 sm:flex-1 sm:px-6 transition-colors duration-300 disabled:opacity-50"
                     >
                       Back
                     </button>
@@ -822,17 +825,18 @@ export default function BookingPage() {
                       type="button"
                       onClick={handlePaystackPayment}
                       disabled={isProcessing}
-                      className="flex-[2] inline-flex items-center justify-center gap-2 bg-[#0BA4DB] hover:bg-[#0993C4] text-white rounded-full font-semibold text-xs tracking-wider uppercase py-3.5 px-6 transition-colors duration-300 shadow hover:shadow-md disabled:opacity-75"
+                      className="min-w-0 flex-1 sm:flex-[2] inline-flex items-center justify-center gap-2 bg-[#0BA4DB] hover:bg-[#0993C4] text-white rounded-full font-semibold text-[10px] sm:text-xs leading-tight text-center tracking-wide sm:tracking-wider uppercase py-3.5 px-3 sm:px-6 transition-colors duration-300 shadow hover:shadow-md disabled:opacity-75"
                     >
                       {isProcessing ? (
                         <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" />
                           <span>Processing...</span>
                         </>
                       ) : (
                         <>
-                          <CreditCard className="w-3.5 h-3.5" />
+                          <CreditCard className="w-3.5 h-3.5 shrink-0" />
                           <span>Pay {feeUsd} USD</span>
+                          <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
                         </>
                       )}
                     </button>
