@@ -322,7 +322,7 @@ export default function BookingPage() {
           transition={{ duration: 0.6 }}
           className="mb-8 sm:mb-12"
         >
-          <h1 className="text-3xl sm:text-5xl lg:text-[60px] font-semibold sm:font-light font-sans uppercase tracking-tight leading-none text-neutral-900">
+          <h1 className="text-2xl sm:text-5xl lg:text-[60px] font-semibold sm:font-light font-sans uppercase tracking-tight leading-none text-neutral-900">
             1-ON-1 WITH{" "}
             <span className="font-sans font-semibold text-[#5D1F17]">
               ADEBIMPE MOHAMMED
