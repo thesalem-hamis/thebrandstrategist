@@ -396,7 +396,10 @@ function AuthenticBrandsPage() {
             </div>
 
             <p className="mt-8 max-w-xl text-sm leading-7 text-white/65 sm:text-base sm:leading-8">
-              I charge $2,000 for work others sell for $100, and high-paying clients say yes. It isn't more talent. It's presentation, packaging, and clarity. <em>Building Authentic Brands</em> shows you how to build a brand that earns that trust without pretending to be someone you're not.
+              My clients could pay $100 elsewhere but they choose to pay me $2,000 because of the experience. It's presentation, packaging, and clarity. 
+
+              <em>Building Authentic Brands</em> 
+              shows you how to build a brand that earns that trust without pretending to be someone you're not.
             </p>
             <div className="mt-8 flex flex-col items-center gap-4">
               <BuyButton>Get the Book Now</BuyButton>
@@ -497,8 +500,8 @@ function AuthenticBrandsPage() {
             </div>
           </div>
           <div className={BODY}>
-            <p>In my industry, there are things I charge $2,000 for that other people still sell for $100.</p>
-            <p>The work isn't twenty times better. The difference is how it's presented, how it's packaged, and how clearly the person behind it is positioned.</p>
+            <p>In my industry, there are people who charge $100 and clients leave them and choose to pay me $2,000.</p>
+            <p>They don't just pay because my work is 20 times better, they also pay because of the experience that comes with working with me.</p>
             <p>That's the same reason I attract high-paying clients. They don't pay for effort. They pay for confidence, clarity and the feeling that they're in the right hands. A brand creates that feeling before you say a single word.</p>
             <blockquote className="my-8 border-l-2 border-[#8DBB77] py-2 pl-5 text-xl font-medium leading-relaxed text-white sm:pl-7 sm:text-2xl">
               Your price is a reflection of your positioning. Change how you're seen, and you change what you can charge.
