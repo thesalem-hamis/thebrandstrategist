@@ -192,7 +192,7 @@ const faqs = [
   { question: "Will this help me charge more?", answer: "The book shows how clarity, presentation and positioning shape how people value you. That's what I've applied in my own work. Results depend on your offer, your market and how you apply what you learn, so no specific outcome is promised." },
   { question: "Do I need a big following or budget?", answer: "No. You need honesty about who you are and the willingness to take one aligned step at a time." },
   { question: "Can it help me rebrand after a setback or a pivot?", answer: "Yes. There's a full section on rebranding for businesses and for personal life, with a step-by-step example of rebuilding trust through consistent action." },
-  { question: "How do I get the book after I pay?", answer: "[Delivery details: format, how and when it arrives, who to contact if there's a problem.]" },
+  { question: "How do I get the book after I pay?", answer: "Once your payment is complete, you will be able to access your e-book and course immediately after logging into your Selar account. Experiencing any issues? Reach out to us via call or WhatsApp at +234 905 961 0911, and we’ll be happy to assist you!" },
 ];
 
 const chapters = [

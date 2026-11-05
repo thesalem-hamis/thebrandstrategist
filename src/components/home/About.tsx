@@ -144,10 +144,8 @@ export const About: React.FC = () => {
               font-medium
             "
           >
-            Adebimpe Mohammed is a Brand Strategist, Consultant, Creative
-            Director and Author helping businesses, founders and professionals
-            transform potential into brands that are clear, distinctive,
-            trusted and positioned for meaningful growth.
+            Adebimpe Mohammed is a brand strategist, creative director and author with more than a decade of experience helping founders, 
+            businesses and professionals turn potential into brands people understand, remember and trust.
           </p>
 
           {/* Experience */}
@@ -185,13 +183,15 @@ export const About: React.FC = () => {
             <span className="text-neutral-800 font-semibold">
               BNM Brand House
             </span>
-            , Adebimpe has led and contributed to brand engagements for more
-            than{" "}
+            , she has led and contributed to brand work for over{" "}
             <span className="text-neutral-800 font-semibold">
               500 businesses, professionals and organisations
             </span>{" "}
-            across brand strategy, positioning, rebranding, personal branding,
-            communication and creative direction.
+              from positioning and rebranding to personal 
+              branding and creative direction. She is also the author of{" "}
+            <span className="text-neutral-800 font-semibold">
+              Building Authentic Brands.
+            </span>
           </p>
 
           {/* Belief */}
