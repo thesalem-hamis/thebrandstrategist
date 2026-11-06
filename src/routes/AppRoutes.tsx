@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
+import LandingLayout from "@/layouts/LandingLayout";
 
 import HomePage from "@/pages/HomePage";
 import AboutPage from "@/pages/AboutPage";
@@ -90,12 +91,15 @@ export default function AppRoutes() {
         <Route index element={<DashboardLogin />} />
       </Route>
 
+      <Route element={<LandingLayout />}>
+        <Route path="/buildingauthenticbrands" element={<AuthenticBrands />} />
+      </Route>
+
       <Route path="/" element={<MainLayout />}>
         <Route index element={<HomePage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="projects" element={<ProjectsPage />} />
         <Route path="projects/:slug" element={<ProjectDetailPage />} />
-        <Route path="buildingauthenticbrands" element={<AuthenticBrands />} />
          <Route path="one-on-one" element={<ConsultationPage />} />
          <Route path="book-a-session" element={<BookingPage />} />
          <Route path="services" element={<ServicesPage />} />
