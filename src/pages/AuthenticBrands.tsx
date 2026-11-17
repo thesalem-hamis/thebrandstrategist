@@ -7,14 +7,10 @@
 // import authorImage from "../assets/BIMPE-3.jpg";
 
 // /**
-//  * Building Authentic Brands — long-form book sales page.
-//  * Every buy button points to the Selar checkout below. The provided copy,
-//  * including its square-bracket placeholders, is intentionally preserved.
-//  */
+/**
+ * Building Authentic Brands — long-form book sales page.
+ */
 
-// const PURCHASE_URL = "https://selar.com/bab";
-
-// // Palette: burgundy is dominant, green stays for eyebrows, card borders and icons.
 // const BTN = "bg-[#7A1F2B] text-white border border-[#C0485A]/40 hover:bg-[#8F2636]";
 // const BURG = "text-[#C0485A]"; // lighter burgundy so large text stays readable on the dark background
 // const GREEN = "text-[#8DBB77]";
@@ -733,15 +729,10 @@ import authorImage from "../assets/BIMPE-3.jpg";
 
 /**
  * Building Authentic Brands — long-form book sales page.
- * Every buy button points to the Selar checkout below. The provided copy,
- * including its square-bracket placeholders, is intentionally preserved.
  */
 
-const PURCHASE_URL = "https://selar.com/bab";
-
-// Palette: burgundy is dominant, green stays for eyebrows, card borders and icons.
 const BTN = "bg-[#7A1F2B] text-white border border-[#C0485A]/40 hover:bg-[#8F2636]";
-const BURG = "text-[#C0485A]"; // lighter burgundy so large text stays readable on the dark background
+const BURG = "text-[#C0485A]";
 const GREEN = "text-[#8DBB77]";
 const BODY = "space-y-5 text-sm leading-7 text-white/65 sm:text-base sm:leading-8";
 
@@ -1057,9 +1048,7 @@ function trackCheckoutClick() {
 function BuyButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <a
-      href={PURCHASE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
+      href="/book"
       onClick={trackCheckoutClick}
       className={`group inline-flex min-h-12 items-center justify-center gap-3 rounded-full px-7 py-3.5 text-xs font-bold transition duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8DBB77] sm:text-sm ${BTN} ${className}`}
     >
@@ -1445,9 +1434,7 @@ function AuthenticBrandsPage() {
             <p className="text-[10px] text-white/45"><Price /></p>
           </div>
           <a
-            href={PURCHASE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/book"
             onClick={trackCheckoutClick}
             className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-5 py-3 text-[10px] font-bold transition sm:text-xs ${BTN}`}
           >

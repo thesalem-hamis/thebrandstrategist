@@ -25,7 +25,6 @@ const EMPTY_FORM = {
   stock_qty: "",
   is_digital: true,
   active: true,
-  selar_link: "",
 };
 
 type UploadField = "image_url" | "pdf_url";
@@ -37,18 +36,14 @@ export default function DashboardBooks() {
   const [showEditor, setShowEditor] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
-
   const [coverUploading, setCoverUploading] = useState(false);
   const [pdfUploading, setPdfUploading] = useState(false);
-
   const [uploadMessage, setUploadMessage] = useState<{
     tone: "ok" | "err";
     text: string;
   } | null>(null);
-
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [message, setMessage] = useState<{ tone: "ok" | "err"; text: string } | null>(null);
@@ -141,7 +136,6 @@ export default function DashboardBooks() {
       stock_qty: product.stock_qty?.toString() ?? "",
       is_digital: product.is_digital ?? true,
       active: product.active ?? true,
-      selar_link: product.selar_link ?? "",
     });
 
     setUploadMessage(null);
@@ -544,15 +538,14 @@ export default function DashboardBooks() {
         author: form.author?.trim() || null,
         description:
           form.description?.trim() || null,
-        price: priceCents,
-        sku: form.sku?.trim() || null,
-        image_url: form.image_url || null,
-        pdf_url: form.pdf_url || null,
-        stock_qty: stockQty,
-        is_digital: form.is_digital,
-        active: form.active,
-        selar_link: form.selar_link?.trim() || null,
-      };
+          price: priceCents,
+          sku: form.sku?.trim() || null,
+          image_url: form.image_url || null,
+          pdf_url: form.pdf_url || null,
+          stock_qty: stockQty,
+          is_digital: form.is_digital,
+          active: form.active,
+        };
 
       // --------------------------------------------------------
       // UPDATE
@@ -1314,34 +1307,6 @@ export default function DashboardBooks() {
                     )}
                   </div>
                 </div>
-              </div>
-
-              {/* Selar Link */}
-
-              <div className="flex flex-col gap-1">
-                <label
-                  htmlFor="selar_link"
-                  className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-neutral-400"
-                >
-                  Selar Link (Optional)
-                </label>
-                <p className="text-[11px] text-neutral-500">
-                  Fill this to redirect to an external Selar store
-                  page instead of Paystack checkout.
-                </p>
-                <input
-                  id="selar_link"
-                  type="url"
-                  value={form.selar_link ?? ""}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      selar_link: e.target.value,
-                    })
-                  }
-                  placeholder="https://selar.co/your-book-link"
-                  className="w-full rounded-xl border border-neutral-200 px-4 py-2.5 text-xs outline-none focus:border-[#5D1F17]"
-                />
               </div>
 
               {/* Digital */}
