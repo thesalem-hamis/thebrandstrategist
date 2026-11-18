@@ -721,8 +721,10 @@
 import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { FaBehance, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowDown, ArrowUpRight, Check, ChevronDown, CircleHelp, X } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Check, ChevronDown, CircleHelp, Mail, User, X } from "lucide-react";
 import { disablePixel, enablePixel, trackEvent } from "@/lib/metaPixel";
+import { supabase } from "@/lib/supabase";
+import type { BookProduct } from "@/lib/types";
 // Adjust these two paths to wherever your assets folder sits relative to this file.
 import bookImage from "../assets/authentic.png";
 import authorImage from "../assets/BIMPE-3.jpg";
@@ -1046,15 +1048,19 @@ function trackCheckoutClick() {
 }
 
 function BuyButton({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const { openCheckout } = useCheckout();
   return (
-    <a
-      href="/book"
-      onClick={trackCheckoutClick}
+    <button
+      type="button"
+      onClick={() => {
+        trackCheckoutClick();
+        openCheckout();
+      }}
       className={`group inline-flex min-h-12 items-center justify-center gap-3 rounded-full px-7 py-3.5 text-xs font-bold transition duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8DBB77] sm:text-sm ${BTN} ${className}`}
     >
       <span>{children}</span>
       <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-    </a>
+    </button>
   );
 }
 
@@ -1084,10 +1090,198 @@ function FaqAccordion() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* CHECKOUT: name + email form that hands off to Paystack             */
+/* ------------------------------------------------------------------ */
+
+type CheckoutCtx = { openCheckout: () => void };
+const CheckoutContext = createContext<CheckoutCtx>({ openCheckout: () => {} });
+
+function useCheckout() {
+  return useContext(CheckoutContext);
+}
+
+function checkoutPrice(product: BookProduct | null): string {
+  if (!product) return "—";
+  if (product.currency === "NGN") {
+    return `₦${Number(product.price).toLocaleString("en-NG")}`;
+  }
+  return `$${(product.price / 100).toFixed(2)}`;
+}
+
+function CheckoutProvider({ children }: { children: React.ReactNode }) {
+  const [product, setProduct] = useState<BookProduct | null>(null);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("book_products")
+        .select("*")
+        .eq("active", true)
+        .or("title.ilike.%Building Authentic Brands%,sku.eq.brand-strategist-book")
+        .limit(1)
+        .maybeSingle();
+      if (data) setProduct(data as BookProduct);
+    })();
+  }, []);
+
+  // Verify the Paystack payment when the buyer is redirected back here.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const payment = params.get("payment");
+    const reference = params.get("reference");
+    if (payment !== "callback" || !reference) return;
+    (async () => {
+      try {
+        setBusy(true);
+        setError(null);
+        const { data, error: fnErr } = await supabase.functions.invoke("verify-payment", { body: { reference } });
+        if (fnErr) throw new Error(fnErr.message || "Payment verification failed");
+        if (!data?.success || !data?.paid) throw new Error(data?.message || "Payment could not be verified");
+        setSuccess(true);
+        setOpen(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Payment verification failed");
+        setOpen(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, []);
+
+  const openCheckout = () => {
+    setError(null);
+    setSuccess(false);
+    setName("");
+    setEmail("");
+    setOpen(true);
+  };
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!product) {
+      setError("Book not available right now.");
+      return;
+    }
+    const n = name.trim();
+    const em = email.trim();
+    if (!n) {
+      setError("Please enter your full name.");
+      return;
+    }
+    if (!em) {
+      setError("Please enter your email address.");
+      return;
+    }
+    setError(null);
+    setBusy(true);
+    try {
+      const { data, error: fnErr } = await supabase.functions.invoke("initialize-payment", {
+        body: {
+          type: "book_order",
+          client_name: n,
+          client_email: em,
+          client_phone: null,
+          product_id: product.id,
+          quantity: 1,
+          callback_path: "/buildingauthenticbrands",
+        },
+      });
+      if (fnErr) throw new Error(fnErr.message || "Unable to initialize payment");
+      if (!data?.success || !data?.authorization_url) throw new Error(data?.message || "Unable to initialize payment");
+      window.location.href = data.authorization_url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to start payment");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <CheckoutContext.Provider value={{ openCheckout }}>
+      {children}
+      {open && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#111] p-6 text-white shadow-xl">
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold">{success ? "Payment successful" : "Get the Book"}</h3>
+                <p className="mt-1 text-xs text-white/60">
+                  {success ? "Your payment was confirmed." : "Enter your details, then you’ll go to Paystack to pay."}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-full p-1 text-white/60 hover:text-white"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {success ? (
+              <div className="space-y-4">
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-200">
+                  Payment verified. Your receipt and download/delivery details have been sent to your email.
+                </div>
+                <button type="button" onClick={() => setOpen(false)} className={`w-full rounded-full px-4 py-3 text-sm font-semibold ${BTN}`}>
+                  Done
+                </button>
+              </div>
+            ) : (
+              <>
+                {error && (
+                  <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-200">{error}</div>
+                )}
+                <form onSubmit={submit} className="space-y-4">
+                  <div className="relative">
+                    <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Full name"
+                      className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-10 pr-3 text-sm text-white outline-none focus:border-[#8DBB77]"
+                      required
+                    />
+                  </div>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@email.com"
+                      className="w-full rounded-xl border border-white/15 bg-white/5 py-3 pl-10 pr-3 text-sm text-white outline-none focus:border-[#8DBB77]"
+                      required
+                    />
+                  </div>
+                  <button type="submit" disabled={busy || !product} className={`w-full rounded-full px-4 py-3 text-sm font-semibold ${BTN} disabled:opacity-60`}>
+                    {busy ? "Redirecting to Paystack…" : `Pay ${checkoutPrice(product)}`}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </CheckoutContext.Provider>
+  );
+}
+
 export default function AuthenticBrands() {
   return (
     <CurrencyProvider>
-      <AuthenticBrandsPage />
+      <CheckoutProvider>
+        <AuthenticBrandsPage />
+      </CheckoutProvider>
     </CurrencyProvider>
   );
 }
@@ -1096,6 +1290,7 @@ function AuthenticBrandsPage() {
   const mainRef = useRef<HTMLElement>(null);
   useScrollStory(mainRef);
   const reduceMotion = useReducedMotion();
+  const { openCheckout } = useCheckout();
 
   // Meta pixel: active only while this page is mounted.
   useEffect(() => {
@@ -1433,13 +1628,16 @@ function AuthenticBrandsPage() {
             <p className="truncate text-xs font-semibold text-white sm:text-sm">Building Authentic Brands</p>
             <p className="text-[10px] text-white/45"><Price /></p>
           </div>
-          <a
-            href="/book"
-            onClick={trackCheckoutClick}
+          <button
+            type="button"
+            onClick={() => {
+              trackCheckoutClick();
+              openCheckout();
+            }}
             className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-5 py-3 text-[10px] font-bold transition sm:text-xs ${BTN}`}
           >
             Get the Book <ArrowUpRight className="h-3.5 w-3.5" />
-          </a>
+          </button>
         </div>
       </div>
       <div className="h-[72px]" aria-hidden="true" />
