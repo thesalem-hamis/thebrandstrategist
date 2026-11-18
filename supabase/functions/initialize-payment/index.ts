@@ -36,6 +36,9 @@ interface InitBody {
   quantity?: number;
   order_number?: string;
   paystack_reference?: string;
+  // Optional post-payment redirect for book orders (e.g. "/buildingauthenticbrands").
+  callback_path?: string;
+  callback_url?: string;
 }
 
 Deno.serve(async (req: Request) => {
@@ -168,12 +171,22 @@ Deno.serve(async (req: Request) => {
         .update({ total_amount: amountCents, currency })
         .eq("id", order.id);
 
+      // Send the buyer back to the page they started from (e.g. the book
+      // landing page) instead of the generic /book store page.
+      const rawCallback =
+        body.callback_url && /^https?:\/\//i.test(body.callback_url)
+          ? body.callback_url
+          : `${FRONTEND_URL}${body.callback_path?.startsWith("/") ? body.callback_path : "/book"}`;
+      const orderCallbackUrl = `${rawCallback}${
+        rawCallback.includes("?") ? "&" : "?"
+      }payment=callback&reference=${reference}`;
+
       paystackBody = {
         email: body.client_email,
         amount: amountCents,
         currency,
         reference,
-        callback_url: `${callbackUrl}&reference=${reference}`,
+        callback_url: orderCallbackUrl,
         metadata: {
           order_id: order.id,
           product_title: product?.title,
